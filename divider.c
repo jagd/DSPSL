@@ -87,7 +87,9 @@ void branchline(double k2, double z0, double h, double eps_r, double freq)
 		"        |              |          \n"
 		"    *---+-----[Zh]-----+-----o    \n"
 		"    |                     Port 3 \n"
-		"   [Z0]                          \n"
+		"    ^                            \n"
+		"    Z0                           \n"
+		"    v                            \n"
 		"    |                            \n"
 		"   ---                           \n"
 		"    -                            \n"
@@ -120,7 +122,7 @@ void wilkinson(double k2, double z0, double h, double eps_r, double freq)
 	double tmp_eps_eff;
 
 	printf(
-		STR_PREFIX"Wilkinson Divider:\n\n"
+		STR_PREFIX"Wilkinson:\n\n"
 		"            +------+----[Z2t]-----o  \n"
 		"           /       |                 \n"
 		"         [Z2]      |           Port 2\n"
