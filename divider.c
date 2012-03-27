@@ -77,7 +77,7 @@ void branchline(double k2, double z0, double h, double eps_r, double freq)
 	double tmp_eps_eff;
 
 	printf(
-		STR_PREFIX"Branchline: \n\n"
+		STR_PREFIX"Branchline:\n\n"
 		"Port 1                     Port 2 \n"
 		"  o-----+-----[Zh]-----+-----o    \n"
 		"        |              |          \n"
@@ -107,9 +107,66 @@ void branchline(double k2, double z0, double h, double eps_r, double freq)
 	lambda_v = calc_lambda(freq, tmp_eps_eff) / 1e6;
 
 	printf(
-		STR_PREFIX"Zh = %lf Ohm ,\tWh = %lf mm ,\t Length = %lf mm\n"
-		STR_PREFIX"Zv = %lf Ohm ,\tWv = %lf mm ,\t Length = %lf mm\n"
+		STR_PREFIX"Zh = %lf Ohm ,\tW = %lf mm ,\t Length = %lf mm\n"
+		STR_PREFIX"Zv = %lf Ohm ,\tW = %lf mm ,\t Length = %lf mm\n"
 		, zh, wh, lambda_h/4, zv, wv, lambda_v/4);
+}
+
+void wilkinson(double k2, double z0, double h, double eps_r, double freq)
+{
+	double k, z2, z3, z2t, z3t, r;
+	double w2, w3, w2t, w3t;
+	double lambda2, lambda3, lambda2t, lambda3t;
+	double tmp_eps_eff;
+
+	printf(
+		STR_PREFIX"Wilkinson Divider:\n\n"
+		"            +------+----[Z2t]-----o  \n"
+		"           /       |                 \n"
+		"         [Z2]      |           Port 2\n"
+		"         /         ^                 \n"
+		"    o---+          R                 \n"
+		"Port 1   \\         v                 \n"
+		"         [Z3]      |           Port 3\n"
+		"           \\       |                 \n"
+		"            +------+----[Z3t]-----o  \n"
+		"\n\n"
+			);
+
+	k = sqrt(k2);
+
+	z2 = z0 * sqrt(1/(k*k*k) + 1/k);
+	z3 = k2 * z2;
+	r = z0 * (k + 1/k);
+	z2t = z0 / sqrt(k);
+	z3t = z0 * sqrt(k);
+
+	w2 = z2w(h, eps_r, z2);
+	w3 = z2w(h, eps_r, z3);
+	w2t = z2w(h, eps_r, z2t);
+	w3t = z2w(h, eps_r, z3t);
+
+	w2z(h, eps_r, w2, &tmp_eps_eff);
+	lambda2 = calc_lambda(freq, tmp_eps_eff) / 1e6;
+	w2z(h, eps_r, w3, &tmp_eps_eff);
+	lambda3 = calc_lambda(freq, tmp_eps_eff) / 1e6;
+	w2z(h, eps_r, w2t, &tmp_eps_eff);
+	lambda2t = calc_lambda(freq, tmp_eps_eff) / 1e6;
+	w2z(h, eps_r, w3t, &tmp_eps_eff);
+	lambda3t = calc_lambda(freq, tmp_eps_eff) / 1e6;
+
+	printf(
+		STR_PREFIX"Z2 = %lf Ohm ,\tW = %lf mm ,\t Length = %lf mm\n"
+		STR_PREFIX"Z3 = %lf Ohm ,\tW = %lf mm ,\t Length = %lf mm\n"
+		STR_PREFIX"Lumped Resistor: R = %lf Ohm\n"
+		STR_PREFIX"Z2t = %lf Ohm ,\tW = %lf mm ,\t Length = %lf mm\n"
+		STR_PREFIX"Z3t = %lf Ohm ,\tW = %lf mm ,\t Length = %lf mm\n",
+		z2, w2, lambda2/4,
+		z3, w3, lambda3/4,
+		r,
+		z2t, w2t, (k == 1) ? 0 : lambda2t/4,
+		z3t, w3t, (k == 1) ? 0 : lambda3t/4
+	);
 }
 
 /*****************************************************************************/
@@ -199,5 +256,7 @@ int main()
 	branchline(k2, z0, h, eps_r, freq);
 	BAR();
 
+	wilkinson(k2, z0, h, eps_r, freq);
+	BAR();
 	return 0;
 }
