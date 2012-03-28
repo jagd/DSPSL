@@ -2,6 +2,10 @@
 #include <stdlib.h>
 #include <math.h>
 
+#ifndef M_PI
+#define M_PI 3.14159265358979323846
+#endif
+
 #define Z_FS 376.73
 #define C0 3e8
 
