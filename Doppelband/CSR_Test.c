@@ -6,7 +6,7 @@
 /******************************************/
 /*              Unit Test                 */
 /******************************************/
-static void dump_readable(struct CSR* m)
+void dump_readable(struct CSR* m)
 {
 	INDEX_TYPE i, j;
 
@@ -23,7 +23,7 @@ static void dump_readable(struct CSR* m)
 
 	for (i = 0; i < m->rows; ++i) {
 		for (j = 0; j < m->cols; ++j) {
-			printf("%10.2f ", CSR_get(m, i, j));
+			printf("%10.4f ", CSR_get(m, i, j));
 		}
 		puts("");
 	}
@@ -31,7 +31,7 @@ static void dump_readable(struct CSR* m)
 	puts("\n");
 }
 
-static void dump_raw(struct CSR* m)
+void dump_raw(struct CSR* m)
 {
 	INDEX_TYPE i;
 
@@ -173,8 +173,81 @@ void test_mul_2()
 	CSR_free(c);
 }
 
+
+void test_sor()
+{
+	struct CSR* a;
+	struct CSR* b;
+	struct CSR* x;
+
+	a = CSR_init(4, 4, 10);
+	CSR_set(a, 0, 0, 100);
+	CSR_set(a, 0, 1, 2);
+	CSR_set(a, 0, 2, 5);
+	CSR_set(a, 0, 3, 4);
+	CSR_set(a, 1, 0, 4);
+	CSR_set(a, 1, 1, 470);
+	CSR_set(a, 1, 2, 2);
+	CSR_set(a, 1, 3, 9);
+	CSR_set(a, 2, 0, 1);
+	CSR_set(a, 2, 1, 8);
+	CSR_set(a, 2, 2, 300);
+	CSR_set(a, 2, 3, 1);
+	CSR_set(a, 3, 0, 6);
+	CSR_set(a, 3, 1, 3);
+	CSR_set(a, 3, 2, 2);
+	CSR_set(a, 3, 3, 500);
+	dump_readable(a);
+
+	b = CSR_init(4, 1, 100);
+	CSR_set(b, 3, 0, 10);
+	CSR_set(b, 2, 0, 7);
+	CSR_set(b, 0, 0, 9);
+	CSR_set(b, 1, 0, 4);
+	dump_readable(b);
+
+	x = CSR_SOR(a, b);
+	dump_readable(x);
+
+	CSR_free(a);
+	CSR_free(b);
+	CSR_free(x);
+}
+
+void test_sor_big(int n)
+{
+	struct CSR* a;
+	struct CSR* b;
+	struct CSR* x;
+	int i,j;
+
+	a = CSR_init(n, n, n*n);
+
+	for (i = 0; i < n; ++i) {
+		for (j = 0; j < n; ++j) {
+			CSR_set(a, i, j, (rand() % 100000) / 10.0);
+		}
+		CSR_set(a, i, i, 100.0*CSR_get(a, i, i));
+	}
+	// dump_readable(a);
+
+	b = CSR_init(n, 1, n);
+	for (i = 0; i < n; ++i) {
+		CSR_set(b, i, 0, 1000.0*(rand() % 100));
+	}
+	// dump_readable(b);
+
+	x = CSR_SOR(a, b);
+	dump_readable(x);
+
+	CSR_free(a);
+	CSR_free(b);
+	CSR_free(x);
+}
+
 int main()
 {
-	test_mul_2();
+	srand(1000);
+	test_sor_big(50);
 	return 0;
 }

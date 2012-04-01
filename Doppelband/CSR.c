@@ -4,6 +4,7 @@
 #include "CSR.h"
 
 #define error printf
+#define EPSILON 1e-5
 
 struct CSR* CSR_init(INDEX_TYPE rows, INDEX_TYPE cols, INDEX_TYPE pre_allocate)
 {
@@ -279,6 +280,7 @@ void CSR_add_online(struct CSR *a, struct CSR *b)
 /*
 	C = AB
 	Sparse A can get the best performance.
+	WARNING: the insert of C can be very inefficient!
 */
 struct CSR* CSR_mul(struct CSR *a, struct CSR* b)
 {
@@ -321,4 +323,184 @@ struct CSR* CSR_mul(struct CSR *a, struct CSR* b)
 	}
 
 	return c;
+}
+
+
+/*
+	calculate `x` from
+
+		Ax = b
+	where `b` is a (vertical) vector
+
+	A = L + D + U
+==>
+	x = D^(-1) * (b - (L + U) * x)
+*/
+/* !!!FIXME!!! */
+struct CSR* CSR_Jacobi(struct CSR *a, struct CSR *b)
+{
+	struct CSR *x, *x_old;
+	INDEX_TYPE row;
+	float eps = 1e37;
+
+#ifdef CSR_CHECK_DIMENSION
+	if (b->cols != 1) {
+		error("Jacobi(A, B): B should have only one column.\n");
+	}
+	if ((a->cols != b->rows) || (a->rows != a->cols)) {
+		error("Jacobi(A, B): dimension of A and B not correct.\n");
+	}
+#endif
+
+	x = CSR_init(b->rows, 1, b->rows);
+	x_old = CSR_init(b->rows, 1, b->rows);
+	/* dirty filling: init all elements to 0 */
+	for (row = 0; row < x->rows; ++row) {
+		x->buf[row] = 0; /* start value */
+		x->row_index[row] = row;
+		x->col_index[row] = 0;
+		x_old->buf[row] = 0; /* start value */
+		x_old->row_index[row] = row;
+		x_old->col_index[row] = 0;
+	}
+	x->size = b->rows;
+	x->row_index[row] = row; /* last fake row_index */
+	x_old->size = b->rows;
+	x_old->row_index[row] = row; /* last fake row_index */
+
+	while (eps > EPSILON) {
+		for (row = 0; row < x->rows; ++row) {
+			x_old->buf[row] = x->buf[row];
+		}
+
+		/* forall rows in A */
+
+		for (row = 0; row < x->rows; ++row) {
+			INDEX_TYPE left, right, i;
+			float val;
+
+			left = a->row_index[row];
+			right = a->row_index[row + 1];
+			if (left >= right) {
+				/* row does not exist */
+				continue;
+			}
+			val = 0;
+			for (i = left; i < right; ++i) {
+				if (row == a->col_index[i]) {
+					continue;
+				}
+				val -= a->buf[i] * x->buf[a->col_index[i]];
+			}
+			x->buf[row] = val;
+		}
+
+		CSR_add_online(x, b);
+
+		for (row = 0; row < x->rows; ++row) {
+			x->buf[row] /= CSR_get(a, row, row);
+		}
+
+		eps = 0;
+		for (row = 0; row < x->rows; ++row) {
+			float delta;
+			delta = x->buf[row] - x_old->buf[row];
+			eps += (delta > 0) ? delta : -delta;
+		}
+	}
+
+	CSR_free(x_old);
+	return x;
+}
+
+/*
+	calculate `x` from
+
+		Ax = b
+	where `b` is a (vertical) vector
+
+	A = L + D + U
+==>
+	x = D^(-1) * (b - (L + U) * x)
+*/
+struct CSR* CSR_SOR(struct CSR *a, struct CSR *b)
+{
+	struct CSR *x, *x_old;
+	INDEX_TYPE row;
+	float eps = 1e37;
+
+#ifdef CSR_CHECK_DIMENSION
+	if (b->cols != 1) {
+		error("Jacobi(A, B): B should have only one column.\n");
+	}
+	if ((a->cols != b->rows) || (a->rows != a->cols)) {
+		error("Jacobi(A, B): dimension of A and B not correct.\n");
+	}
+#endif
+
+	x = CSR_init(b->rows, 1, b->rows);
+	x_old = CSR_init(b->rows, 1, b->rows);
+	/* dirty filling: init all elements to 0 */
+	for (row = 0; row < x->rows; ++row) {
+		x->buf[row] = 0; /* start value */
+		x->row_index[row] = row;
+		x->col_index[row] = 0;
+		x_old->buf[row] = 0; /* start value */
+		x_old->row_index[row] = row;
+		x_old->col_index[row] = 0;
+	}
+	x->size = b->rows;
+	x->row_index[row] = row; /* last fake row_index */
+	x_old->size = b->rows;
+	x_old->row_index[row] = row; /* last fake row_index */
+
+	while (eps > EPSILON) {
+		for (row = 0; row < x->rows; ++row) {
+			x_old->buf[row] = x->buf[row];
+		}
+
+		/* forall rows in A */
+
+		for (row = 0; row < x->rows; ++row) {
+			INDEX_TYPE left, right, i;
+			float val;
+
+			left = a->row_index[row];
+			right = a->row_index[row + 1];
+			if (left >= right) {
+				/* row does not exist */
+				continue;
+			}
+			val = 0;
+			for (i = left; i < right; ++i) {
+				if (row == a->col_index[i]) {
+					continue;
+				}
+				if (row < a->col_index[i]) {
+					val -= a->buf[i] * x->buf[a->col_index[i]];
+				} else {
+					val -= a->buf[i] * x_old->buf[a->col_index[i]];
+				}
+			}
+			x->buf[row] = val;
+		}
+
+		CSR_add_online(x, b);
+
+		for (row = 0; row < x->rows; ++row) {
+			x->buf[row] *= CSR_SOR_OMEGA;
+			x->buf[row] /= CSR_get(a, row, row);
+			x->buf[row] += (1-CSR_SOR_OMEGA) * x_old->buf[row];
+		}
+
+		eps = 0;
+		for (row = 0; row < x->rows; ++row) {
+			float delta;
+			delta = x->buf[row] - x_old->buf[row];
+			eps += (delta > 0) ? delta : -delta;
+		}
+	}
+
+	CSR_free(x_old);
+	return x;
 }

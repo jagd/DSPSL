@@ -4,6 +4,7 @@
 #define CSR_CHECK_DIMENSION 1
 
 #define INCREASE_SIZE 1000
+#define CSR_SOR_OMEGA 1.5
 
 /* Should not be size_t , because a signed type is necessary */
 /* In some case, say row or column > 32767 , 32 bit is not enough*/
@@ -26,5 +27,6 @@ void CSR_set(struct CSR* m, INDEX_TYPE row, INDEX_TYPE col, float val);
 void CSR_set_add(struct CSR* m, INDEX_TYPE row, INDEX_TYPE col, float toadd);
 void CSR_add_online(struct CSR *a, struct CSR *b);
 struct CSR* CSR_mul(struct CSR *a, struct CSR* b);
+struct CSR* CSR_SOR(struct CSR *a, struct CSR *b);
 
 #endif
