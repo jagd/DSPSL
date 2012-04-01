@@ -25,5 +25,6 @@ float CSR_get(struct CSR* m, INDEX_TYPE row, INDEX_TYPE col);
 void CSR_set(struct CSR* m, INDEX_TYPE row, INDEX_TYPE col, float val);
 void CSR_set_add(struct CSR* m, INDEX_TYPE row, INDEX_TYPE col, float toadd);
 void CSR_add_online(struct CSR *a, struct CSR *b);
+struct CSR* CSR_mul(struct CSR *a, struct CSR* b);
 
 #endif

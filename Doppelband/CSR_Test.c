@@ -64,12 +64,9 @@ static void dump_raw(struct CSR* m)
 	putchar('\n');
 }
 
-int main()
+void test_create()
 {
 	struct CSR* m;
-	struct CSR* a;
-
-	// dump_raw(NULL);
 
 	m = CSR_init(3, 4, 1);
 
@@ -85,11 +82,13 @@ int main()
 	dump_raw(m);
 	dump_readable(m);
 
-	printf("\n\nAddition:\n");
-	CSR_add_online(m, m); /* overwrite */
-	dump_readable(m);
+	CSR_free(m);
+}
 
-	printf("\n\nAddition with:\n");
+void test_add()
+{
+	struct CSR *a, *b;
+
 	a = CSR_init(3, 4, 100);
 	CSR_set(a, 0, 0, 1);
 	CSR_set(a, 1, 1, 2);
@@ -97,11 +96,85 @@ int main()
 	CSR_set(a, 2, 3, 4);
 	CSR_set(a, 0, 3, 5);
 	dump_readable(a);
-	printf("\nResult :\n");
-	CSR_add_online(a, m); /* overwrite */
+
+	b = CSR_init(3, 4, 1);
+	CSR_set(b, 0, 0, 1);
+	CSR_set(b, 0, 1, 2);
+	CSR_set(b, 1, 1, 3);
+	CSR_set(b, 1, 2, 9);
+	CSR_set(b, 2, 1, 1);
+	CSR_set(b, 2, 2, 4);
+	dump_readable(a);
+
+	CSR_add_online(a, b); /* overwrite */
 	dump_readable(a);
 
 	CSR_free(a);
-	CSR_free(m);
+	CSR_free(b);
+}
+
+void test_mul()
+{
+	struct CSR* a;
+	struct CSR* b;
+	struct CSR* c;
+
+	a = CSR_init(3, 4, 100);
+	CSR_set(a, 0, 0, 1);
+	CSR_set(a, 1, 1, 2);
+	CSR_set(a, 2, 2, 3);
+	CSR_set(a, 2, 3, 4);
+	CSR_set(a, 0, 3, 5);
+	dump_readable(a);
+
+	b = CSR_init(4, 3, 100);
+	CSR_set(b, 3, 2, 10);
+	CSR_set(b, 0, 0, 3);
+	CSR_set(b, 1, 2, 4);
+	CSR_set(b, 1, 1, 2);
+	CSR_set(b, 3, 0, 5);
+	CSR_set(b, 2, 1, 4);
+	dump_readable(b);
+
+	c = CSR_mul(a, b);
+	dump_readable(c);
+
+	CSR_free(a);
+	CSR_free(b);
+	CSR_free(c);
+}
+
+void test_mul_2()
+{
+	struct CSR* a;
+	struct CSR* b;
+	struct CSR* c;
+
+	a = CSR_init(3, 4, 100);
+	CSR_set(a, 0, 0, 1);
+	CSR_set(a, 1, 1, 2);
+	CSR_set(a, 2, 2, 3);
+	CSR_set(a, 2, 3, 4);
+	CSR_set(a, 0, 3, 5);
+	dump_readable(a);
+
+	b = CSR_init(4, 1, 100);
+	CSR_set(b, 3, 0, 10);
+	CSR_set(b, 2, 0, 4);
+	CSR_set(b, 0, 0, 3);
+	CSR_set(b, 1, 0, 4);
+	dump_readable(b);
+
+	c = CSR_mul(a, b);
+	dump_readable(c);
+
+	CSR_free(a);
+	CSR_free(b);
+	CSR_free(c);
+}
+
+int main()
+{
+	test_mul_2();
 	return 0;
 }

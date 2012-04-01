@@ -32,6 +32,10 @@ struct CSR* CSR_init(INDEX_TYPE rows, INDEX_TYPE cols, INDEX_TYPE pre_allocate)
 
 void CSR_free(struct CSR* p)
 {
+	if (p == NULL) {
+		return;
+	}
+
 	free(p->row_index);
 	free(p->buf);
 	free(p->col_index);
@@ -54,6 +58,12 @@ float CSR_get(struct CSR* m, INDEX_TYPE row, INDEX_TYPE col)
 	INDEX_TYPE left, right;
 	/* index in the buffer, left <= the target < right */
 	INDEX_TYPE mid = 0;
+
+#ifdef CSR_CHECK_DIMENSION
+	if (row < 0 || row >= m->rows || col < 0 || col >= m->cols) {
+		error("CSR_get(): invalid row or col");
+	}
+#endif
 
 	left = m->row_index[row];
 	right = m->row_index[row + 1];
@@ -88,6 +98,12 @@ void CSR_set(struct CSR* m, INDEX_TYPE row, INDEX_TYPE col, float val)
 	INDEX_TYPE left, right;
 	/* index in the buffer, left <= the target < right */
 	INDEX_TYPE mid = 0;
+
+#ifdef CSR_CHECK_DIMENSION
+	if (row < 0 || row >= m->rows || col < 0 || col >= m->cols) {
+		error("CSR_set(): invalid row or col");
+	}
+#endif
 
 	left = m->row_index[row];
 	right = m->row_index[row + 1];
@@ -161,6 +177,12 @@ void CSR_set_add(struct CSR* m, INDEX_TYPE row, INDEX_TYPE col, float toadd)
 	INDEX_TYPE left, right;
 	/* index in the buffer, left <= the target < right */
 	INDEX_TYPE mid = 0;
+
+#ifdef CSR_CHECK_DIMENSION
+	if (row < 0 || row >= m->rows || col < 0 || col >= m->cols) {
+		error("CSR_set_add(): invalid row or col");
+	}
+#endif
 
 	left = m->row_index[row];
 	right = m->row_index[row + 1];
@@ -251,4 +273,52 @@ void CSR_add_online(struct CSR *a, struct CSR *b)
 			CSR_set_add(a, row, b->col_index[i], b->buf[i]);
 		}
 	}
+}
+
+
+/*
+	C = AB
+	Sparse A can get the best performance.
+*/
+struct CSR* CSR_mul(struct CSR *a, struct CSR* b)
+{
+	struct CSR* c;
+	INDEX_TYPE row;
+
+#ifdef CSR_CHECK_DIMENSION
+	if (a->cols != b->rows) {
+		error("CSR_mul(A,B): dimension of A and B not correct.\n");
+		return NULL;
+	}
+#endif
+
+	c = CSR_init( (a->rows < b->rows) ? a->rows : b->rows,
+			(a->cols < b->cols) ? a->cols : b->cols,
+			(a->size > b->size)?a->size:b->size );
+
+	/* forall rows in a --> rows in c with multiplication col in b */
+	for (row = 0; row < a->rows; ++row) {
+		INDEX_TYPE col_c;
+		INDEX_TYPE left, right;
+		left = a->row_index[row];
+		right = a->row_index[row + 1];
+		if (left >=  right) {
+			/* row does not exist => c[ _ , row ] = 0 */
+			continue;
+		}
+		/* row exist */
+		for (col_c = 0; col_c < b->cols; ++col_c) {
+			INDEX_TYPE i_a;
+			float v = 0;
+			for (i_a= left; i_a < right; ++i_a) {
+				v += a->buf[i_a]
+					* CSR_get(b, a->col_index[i_a], col_c);
+			}
+			if (v != 0) {
+				CSR_set(c, row, col_c, v);
+			}
+		}
+	}
+
+	return c;
 }
