@@ -175,6 +175,42 @@ void wilkinson(double k2, double z0, double h, double eps_r, double freq)
 	);
 }
 
+void novel_loop(double k2, double z0, double h, double eps_r, double freq)
+{
+	double z;
+	double l_cos, w;
+	double lambda;
+	double tmp_eps_eff;
+
+	printf(
+		STR_PREFIX"A novel loop:\n\n"
+		"           +-----------[Z,L2]-------------+         \n"
+		"           |                              |   Port 2\n"
+		"   o-------+                              +------o  \n"
+		"Port 1     |                              |         \n"
+		"           |                             <R>        \n"
+		"           |                              |         \n"
+		"           +----[Z,L3]----+----[Z,L3']----+         \n"
+		"                          |                         \n"
+		"                          |                         \n"
+		"                          |                         \n"
+		"                Port 3    o                         \n"
+		"\n\n"
+		);
+
+	z = z0 * sqrt(2);
+
+	w = z2w(h, eps_r, z);
+
+	w2z(h, eps_r, w, &tmp_eps_eff);
+	lambda = calc_lambda(freq, tmp_eps_eff) / 1e6;
+	l_cos = 0.5*lambda * acos(1/sqrt(k2)) / M_PI;
+
+	printf(
+		STR_PREFIX"R = 100 Ohm ,\t Z = %lf Ohm ,\t W = %lf mm\n"
+		STR_PREFIX"L2 = %lfmm ,\t L3 = %lf mm ,\t L3' = %lfmm\n"
+		, z, w, lambda/4 + l_cos, lambda/4, l_cos);
+}
 /*****************************************************************************/
 
 static double read_eps_r()
@@ -264,5 +300,9 @@ int main()
 
 	wilkinson(k2, z0, h, eps_r, freq);
 	BAR();
+
+	novel_loop(k2, z0, h, eps_r, freq);
+	BAR();
+
 	return 0;
 }
