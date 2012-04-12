@@ -7,7 +7,6 @@ w2 = 10e-3;
 d = 0e-3;
 
 eps_r = 2.2;
-% eps_r = 1;
 h = 0.79e-3;
 
 port_ext = 2e-3;
@@ -19,8 +18,10 @@ INT_STEP = 100;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
-mu_0 = 120*pi / 3e8;
-eps_0 = 1/(120*pi*3e8);
+c0 = 3e8;
+z0 = 120*pi;
+mu_0 =  z0 / c0;
+eps_0 = 1/(z0 * c0);
 
 width_org = max(w1*0.5, w2*0.5 - d) + d + max(w1*0.5 - d, w2*0.5);
 port.left = -width_org*0.5 - port_ext;
