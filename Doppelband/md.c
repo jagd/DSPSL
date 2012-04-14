@@ -164,11 +164,15 @@ void md_inverse_direct(struct MD *m)
 		}
 
 		/************* 2 *************/
+		/* the elimination */
 		// TODO: use norm
 		for (j = 0; j < m->cols; ++j) {
-			
 		}
+
 	}
+
+	/* column exchanging (not row !) */
+	// TODO: 
 
 	free(row_exchange);
 }
