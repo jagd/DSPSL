@@ -124,25 +124,19 @@ void md_inverse_direct(struct MD *m)
 		row_exchange[row] = row; /* init */
 
 		for (row2 = row; row2 < m->rows; ++row2) {
-			int index; /* to save some multiplications */
 			int sum;
 			double curr;
 			double unscale_val;
 
-			/* row2 <+> the outer column index */
-			index = row2*m->cols + row;
-
-			/* to save the `sum` calculation */
-			unscale_val = m->buf[index];
+			unscale_val = m->buf[row2*m->cols + row];
 			if (unscale_val == 0) {
 				continue;
 			}
 
 			sum = 0;
 			for (col = row; col < m->cols; ++col) {
-				int val = m->buf[index];
+				int val = m->buf[row2*m->cols + col];
 				sum += val >= 0 ? val : -val; /* inline abs */
-				++index;
 			}
 
 			curr = unscale_val / sum;
@@ -159,19 +153,16 @@ void md_inverse_direct(struct MD *m)
 
 		if (row != row_exchange[row]) {
 			/* for 2 row operations, to save the multiplication */
-			int index1, index2;
+			int base1, base2;
 
-			index1 = row*m->cols;
-			index2 = row_exchange[row]*m->cols;
+			base1 = row*m->cols;
+			base2 = row_exchange[row]*m->cols;
 			for (col = 0; col < m->cols; ++col) {
 				double tmp;
 
-				tmp = m->buf[index1];
-				m->buf[index1] = m->buf[index2];
-				m->buf[index2] = tmp;
-
-				++index1;
-				++index2;
+				tmp = m->buf[base1 + col];
+				m->buf[base1 + col] = m->buf[base2 + col];
+				m->buf[base2 + col] = tmp;
 			}
 		}
 
