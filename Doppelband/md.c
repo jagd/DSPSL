@@ -195,11 +195,13 @@ void md_inverse_direct(struct MD *m)
 
 
 			for (row2 = 0; row2 < row; ++row2) {
-				factor = m->buf[row2*m->cols + row] * m->buf[row*m->cols + col];
+				factor = m->buf[row2*m->cols + row]
+						* m->buf[row*m->cols + col];
 				m->buf[row2*m->cols + col] += factor;
 			}
 			for (row2 = row + 1; row2 < m->rows; ++row2) {
-				factor = m->buf[row2*m->cols + row] * m->buf[row*m->cols + col];
+				factor = m->buf[row2*m->cols + row]
+						* m->buf[row*m->cols + col];
 				m->buf[row2*m->cols + col] += factor;
 			}
 		}
