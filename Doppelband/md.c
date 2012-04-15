@@ -1,18 +1,11 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include "md.h"
+
 #define error printf
-#define INLINE inline
 
-#define ENABLE_RANGE_CHECKING 1
-
-/* Matrix of Double */
-struct MD {
-	int rows, cols;
-	double *buf;
-};
-
-
+#ifdef MD_ENABLE_DEBUG
 void md_dump(struct MD *m)
 {
 	int row, col, i;
@@ -25,7 +18,7 @@ void md_dump(struct MD *m)
 		putchar('\n');
 	}
 }
-
+#endif
 
 struct MD* md_init(int rows, int cols)
 {
@@ -72,9 +65,9 @@ void md_free(struct MD *m)
 }
 
 
-void INLINE md_set(struct MD *m, int row, int col, double val)
+void md_set(struct MD *m, int row, int col, double val)
 {
-#ifdef ENABLE_RANGE_CHECKING
+#ifdef MD_ENABLE_RANGE_CHECKING
 	if ((row < 0 || row >= m->rows)
 		|| (col < 0 || col >= m->cols)) {
 		error("md_set(): index out of range\n");
@@ -85,9 +78,9 @@ void INLINE md_set(struct MD *m, int row, int col, double val)
 }
 
 
-double INLINE md_get(struct MD *m, int row, int col)
+double md_get(struct MD *m, int row, int col)
 {
-#ifdef ENABLE_RANGE_CHECKING
+#ifdef MD_ENABLE_RANGE_CHECKING
 	if ((row < 0 || row >= m->rows)
 		|| (col < 0 || col >= m->cols)) {
 		error("md_set(): index out of range\n");
@@ -103,6 +96,13 @@ void md_inverse_direct(struct MD *m)
 	int *row_exchange;
 	int row, col;
 
+#ifdef MD_ENABLE_RANGE_CHECKING
+	if (m->rows != m->cols) {
+		error("md_inverse_direct(): Matrix must be square");
+		return;
+	}
+#endif
+
 	row_exchange = (int*)malloc(m->rows * sizeof(int));
 
 	for (row = 0; row < m->rows; ++row) {
@@ -116,7 +116,7 @@ void md_inverse_direct(struct MD *m)
 
 		double factor;
 
-		double pivot_val; /* the pivot value */
+		double pivot_val = 0; /* the pivot value */
 
 		int row2;
 		double col_max = 0;
@@ -175,6 +175,12 @@ void md_inverse_direct(struct MD *m)
 			}
 		}
 
+#ifdef MD_ENABLE_DEBUG
+		if (pivot_val == 0) {
+			error("md_inverse_direct(): Matrix is singular\n");
+			return;
+		}
+#endif
 		/************* 2 *************/
 		/* the elimination */
 
@@ -234,33 +240,4 @@ void md_inverse_direct(struct MD *m)
 	}
 
 	free(row_exchange);
-}
-
-int main()
-{
-
-	struct MD *a;
-
-	a = md_init(3, 3);
-	md_fill(a, 0);
-	md_set(a, 0, 0, 2);
-	md_set(a, 0, 1, 7);
-	md_set(a, 1, 0, 5);
-	md_set(a, 1, 1, 3);
-
-	md_set(a, 0, 2, -1);
-	md_set(a, 1, 2, -5);
-	md_set(a, 2, 0, 11);
-	md_set(a, 2, 1, 12);
-	md_set(a, 2, 2, 22);
-
-	md_dump(a);
-
-	md_inverse_direct(a);
-	printf("\ninversed:\n");
-	md_dump(a);
-
-	md_free(a);
-
-	return 0;
 }
