@@ -179,32 +179,10 @@ md_dump(m);
 		/************* 2 *************/
 		/* the elimination */
 
-		/* first, the other equation */
-		/* except col == row */
-		for (col = 0; col < m->cols; ++col) {
-			if (col == row) {
-				continue;
-			}
+printf("pivot_val = %lf:\n", pivot_val);
 
-			factor = 1 - (m->buf[row*m->cols + col] / pivot_val);
-
-			for (row2 = 0; row2 < row; ++row2) {
-				m->buf[row2*m->cols + col] *= factor;
-			}
-			for (/*row2 = row + 1*/; row2 < m->rows; ++row2) {
-				m->buf[row2*m->cols + col] *= factor;
-			}
-		}
-		/* for col == row */
+		/* first, calculate the exchanged equation */
 		factor = 1/pivot_val;
-		for (row2 = 0; row2 < row; ++row2) {
-			m->buf[row2*m->cols + row] *= factor;
-		}
-		for (/*row2 = row + 1*/; row2 < m->rows; ++row2) {
-			m->buf[row2*m->cols + row] *= factor;
-		}
-
-		/* second, the exchanged equation */
 		m->buf[row*m->cols + row] = factor;
 		factor = -factor;
 		for (col = 0; col < row; ++col) {
@@ -212,6 +190,34 @@ md_dump(m);
 		}
 		for (col = row + 1; col < m->cols; ++col) {
 			m->buf[row*m->cols + col] *= factor;
+		}
+
+printf("between elimination for row %d:\n", row);
+md_dump(m);
+		/* second, the other equation */
+		/* except col == row */
+		for (col = 0; col < m->cols; ++col) {
+			if (col == row) {
+				continue;
+			}
+
+
+			for (row2 = 0; row2 < row; ++row2) {
+				factor = m->buf[row2*m->cols + row] * m->buf[row*m->cols + col];
+				m->buf[row2*m->cols + col] += factor;
+			}
+			for (row2 = row + 1; row2 < m->rows; ++row2) {
+				factor = m->buf[row2*m->cols + row] * m->buf[row*m->cols + col];
+				m->buf[row2*m->cols + col] += factor;
+			}
+		}
+		/* for col == row */
+		factor = 1/pivot_val;
+		for (row2 = 0; row2 < row; ++row2) {
+			m->buf[row2*m->cols + row] *= factor;
+		}
+		for (row2 = row + 1; row2 < m->rows; ++row2) {
+			m->buf[row2*m->cols + row] *= factor;
 		}
 printf("after elimination for row %d:\n", row);
 md_dump(m);
@@ -242,11 +248,18 @@ int main()
 
 	struct MD *a;
 
-	a = md_init(2, 2);
+	a = md_init(3, 3);
 	md_fill(a, 0);
 	md_set(a, 0, 0, 2);
 	md_set(a, 0, 1, 7);
+	md_set(a, 1, 0, 5);
 	md_set(a, 1, 1, 3);
+
+	md_set(a, 0, 2, -1);
+	md_set(a, 1, 2, -5);
+	md_set(a, 2, 0, 11);
+	md_set(a, 2, 1, 12);
+	md_set(a, 2, 2, 22);
 
 	md_dump(a);
 
