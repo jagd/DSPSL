@@ -78,6 +78,7 @@ void INLINE md_set(struct MD *m, int row, int col, double val)
 	if ((row < 0 || row >= m->rows)
 		|| (col < 0 || col >= m->cols)) {
 		error("md_set(): index out of range\n");
+		return;
 	}
 #endif
 	m->buf[row*m->cols + col] = val;
@@ -90,6 +91,7 @@ double INLINE md_get(struct MD *m, int row, int col)
 	if ((row < 0 || row >= m->rows)
 		|| (col < 0 || col >= m->cols)) {
 		error("md_set(): index out of range\n");
+		return 0;
 	}
 #endif
 	return m->buf[row*m->cols + col];
