@@ -12,6 +12,21 @@ struct MD {
 	double *buf;
 };
 
+
+void md_dump(struct MD *m)
+{
+	int row, col, i;
+
+	i = 0;
+	for (row = 0; row < m->rows; ++row) {
+		for (col = 0; col < m->cols; ++col) {
+			printf("%12.3lf", m->buf[i++]);
+		}
+		putchar('\n');
+	}
+}
+
+
 struct MD* md_init(int rows, int cols)
 {
 	struct MD *m;
@@ -33,6 +48,7 @@ struct MD* md_init(int rows, int cols)
 	return m;
 }
 
+
 void md_fill(struct MD *m, double val)
 {
 	int i, t;
@@ -44,6 +60,7 @@ void md_fill(struct MD *m, double val)
 	}
 }
 
+
 void md_free(struct MD *m)
 {
 	if (m) {
@@ -53,6 +70,7 @@ void md_free(struct MD *m)
 		free(m);
 	}
 }
+
 
 void INLINE md_set(struct MD *m, int row, int col, double val)
 {
@@ -65,6 +83,7 @@ void INLINE md_set(struct MD *m, int row, int col, double val)
 	m->buf[row*m->cols + col] = val;
 }
 
+
 double INLINE md_get(struct MD *m, int row, int col)
 {
 #ifdef ENABLE_RANGE_CHECKING
@@ -76,18 +95,6 @@ double INLINE md_get(struct MD *m, int row, int col)
 	return m->buf[row*m->cols + col];
 }
 
-void md_dump(struct MD *m)
-{
-	int row, col, i;
-
-	i = 0;
-	for (row = 0; row < m->rows; ++row) {
-		for (col = 0; col < m->cols; ++col) {
-			printf("%12.3lf", m->buf[i++]);
-		}
-		putchar('\n');
-	}
-}
 
 void md_inverse_direct(struct MD *m)
 {
@@ -105,10 +112,9 @@ void md_inverse_direct(struct MD *m)
 		   treating the first columns were 0
 		*/
 
-		int norm; /* the pivot value */
+		double factor;
 
-		/* for 2 row operations, to save the multiplication */
-		int index1, index2;
+		double pivot_val; /* the pivot value */
 
 		int row2;
 		double col_max = 0;
@@ -121,7 +127,7 @@ void md_inverse_direct(struct MD *m)
 			double curr;
 			double unscale_val;
 
-			/* row2 <+> the outter column index */
+			/* row2 <+> the outer column index */
 			index = row2*m->cols + row;
 
 			/* to save the `sum` calculation */
@@ -141,7 +147,7 @@ void md_inverse_direct(struct MD *m)
 			curr = curr >= 0 ? curr : -curr; /* inline abs*/
 
 			if (curr > col_max) {
-				norm = unscale_val;
+				pivot_val = unscale_val;
 				col_max = curr;
 				row_exchange[row] = row2;
 			}
@@ -149,30 +155,84 @@ void md_inverse_direct(struct MD *m)
 
 		/* do rows exchange, move the pivoting row to the next */
 
-		/* to save multiplications */
-		index1 = row*m->cols;
-		index2 = row_exchange[row]*m->cols;
-		for (col = 0; col < m->cols; ++col) {
-			double tmp;
+		if (row != row_exchange[row]) {
+			/* for 2 row operations, to save the multiplication */
+			int index1, index2;
 
-			tmp = m->buf[index1];
-			m->buf[index1] = m->buf[index2];
-			m->buf[index2] = tmp;
+			index1 = row*m->cols;
+			index2 = row_exchange[row]*m->cols;
+			for (col = 0; col < m->cols; ++col) {
+				double tmp;
 
-			++index1;
-			++index2;
+				tmp = m->buf[index1];
+				m->buf[index1] = m->buf[index2];
+				m->buf[index2] = tmp;
+
+				++index1;
+				++index2;
+			}
 		}
+
+printf("after exchange for row %d:\n", row);
+md_dump(m);
 
 		/************* 2 *************/
 		/* the elimination */
-		// TODO: use norm
-		for (j = 0; j < m->cols; ++j) {
+
+		/* first, the other equation */
+		/* except col == row */
+		for (col = 0; col < m->cols; ++col) {
+			if (col == row) {
+				continue;
+			}
+
+			factor = 1 - (m->buf[row*m->cols + col] / pivot_val);
+
+			for (row2 = 0; row2 < row; ++row2) {
+				m->buf[row2*m->cols + col] *= factor;
+			}
+			for (/*row2 = row + 1*/; row2 < m->rows; ++row2) {
+				m->buf[row2*m->cols + col] *= factor;
+			}
 		}
+		/* for col == row */
+		factor = 1/pivot_val;
+		for (row2 = 0; row2 < row; ++row2) {
+			m->buf[row2*m->cols + row] *= factor;
+		}
+		for (/*row2 = row + 1*/; row2 < m->rows; ++row2) {
+			m->buf[row2*m->cols + row] *= factor;
+		}
+
+		/* second, the exchanged equation */
+		m->buf[row*m->cols + row] = factor;
+		factor = -factor;
+		for (col = 0; col < row; ++col) {
+			m->buf[row*m->cols + col] *= factor;
+		}
+		for (col = row + 1; col < m->cols; ++col) {
+			m->buf[row*m->cols + col] *= factor;
+		}
+printf("after elimination for row %d:\n", row);
+md_dump(m);
 
 	}
 
 	/* column exchanging (not row !) */
-	// TODO: 
+	for (col = m->rows - 2; col >= 0; --col) {
+		int col2 = row_exchange[col];
+		if (col == col2) {
+			continue;
+		}
+
+		for (row = 0; row < m->rows; ++row) {
+			double tmp;
+			tmp = m->buf[row*m->cols + col];
+			m->buf[row*m->cols + col] =
+				m->buf[row*m->cols + col2];
+			m->buf[row*m->cols + col2] = tmp;
+		}
+	}
 
 	free(row_exchange);
 }
@@ -182,12 +242,16 @@ int main()
 
 	struct MD *a;
 
-	a = md_init(3, 3);
+	a = md_init(2, 2);
 	md_fill(a, 0);
-	md_set(a, 0, 0, 1);
-	md_set(a, 1, 1, 2);
-	md_set(a, 2, 2, 1);
+	md_set(a, 0, 0, 2);
+	md_set(a, 0, 1, 7);
+	md_set(a, 1, 1, 3);
 
+	md_dump(a);
+
+	md_inverse_direct(a);
+	printf("\ninversed:\n");
 	md_dump(a);
 
 	md_free(a);
