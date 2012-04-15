@@ -3,9 +3,27 @@
 
 #include "md.h"
 
-int main()
+void big_random()
 {
+	int size = 500;
+	struct MD *a;
+	int i, j;
 
+	a = md_init(size, size);
+
+	for (i = 0; i < size; ++i) {
+		for (j = 0; j < size; ++j) {
+			md_set(a, i, j, random()%1000);
+		}
+	}
+
+	md_inverse_direct(a);
+
+	md_free(a);
+}
+
+void tiny()
+{
 	struct MD *a;
 
 	a = md_init(3, 3);
@@ -28,6 +46,13 @@ int main()
 	md_dump(a);
 
 	md_free(a);
+}
 
+int main()
+{
+	printf("=== tiny ===\n");
+	tiny();
+	printf("=== big ===\n");
+	big_random();
 	return 0;
 }
