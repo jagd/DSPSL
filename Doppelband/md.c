@@ -175,13 +175,8 @@ void md_inverse_direct(struct MD *m)
 			}
 		}
 
-printf("after exchange for row %d:\n", row);
-md_dump(m);
-
 		/************* 2 *************/
 		/* the elimination */
-
-printf("pivot_val = %lf:\n", pivot_val);
 
 		/* first, calculate the exchanged equation */
 		factor = 1/pivot_val;
@@ -194,8 +189,6 @@ printf("pivot_val = %lf:\n", pivot_val);
 			m->buf[row*m->cols + col] *= factor;
 		}
 
-printf("between elimination for row %d:\n", row);
-md_dump(m);
 		/* second, the other equation */
 		/* except col == row */
 		for (col = 0; col < m->cols; ++col) {
@@ -221,8 +214,6 @@ md_dump(m);
 		for (row2 = row + 1; row2 < m->rows; ++row2) {
 			m->buf[row2*m->cols + row] *= factor;
 		}
-printf("after elimination for row %d:\n", row);
-md_dump(m);
 
 	}
 
