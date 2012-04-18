@@ -2,11 +2,14 @@
 
 CFLAGS:=-O3 -Wall $(CFLAGS)
 
-all: md_test
+all: md_test mom
 
 md_test: md_test.c md.c
 	$(CC) -D MD_ENABLE_DEBUG  $(CFLAGS) $^ -o $@
 
+mom: mom.c mom_mesh.c md.c
+	$(CC) -lm $(CFLAGS) $^ -o $@
+
 clean:
 	-rm *.o
-	-rm md_test
+	-rm mom md_test
