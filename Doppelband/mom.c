@@ -73,7 +73,7 @@ static INLINE void potential_strip0(struct MeshConfig *conf, struct MD *a)
 				y_old = y;
 			}
 
-			a->buf[i*(a->rows) + j] = sum * 0.5;
+			a->buf[i*(a->rows) + j] = sum * -0.5;
 		}
 
 		/* from dielectric[0] */
@@ -111,7 +111,7 @@ static INLINE void potential_strip0(struct MeshConfig *conf, struct MD *a)
 				y_old = y;
 			}
 
-			a->buf[i*(a->rows) + j] = sum * 0.5;
+			a->buf[i*(a->rows) + j] = sum * -0.5;
 		}
 
 		/* from strip[1] */
@@ -145,7 +145,7 @@ static INLINE void potential_strip0(struct MeshConfig *conf, struct MD *a)
 				y_old = y;
 			}
 
-			a->buf[i*(a->rows) + j] = sum * 0.5;
+			a->buf[i*(a->rows) + j] = sum * -0.5;
 		}
 
 		/* from dielectric[1] */
@@ -179,7 +179,7 @@ static INLINE void potential_strip0(struct MeshConfig *conf, struct MD *a)
 				y_old = y;
 			}
 
-			a->buf[i*(a->rows) + j] = sum * 0.5;
+			a->buf[i*(a->rows) + j] = sum * -0.5;
 		}
 	}
 }
@@ -226,7 +226,7 @@ static INLINE void potential_strip1(struct MeshConfig *conf, struct MD *a)
 				y_old = y;
 			}
 
-			a->buf[i*(a->rows) + j] = sum * 0.5;
+			a->buf[i*(a->rows) + j] = sum * -0.5;
 		}
 
 		/* from dielectric[0] */
@@ -260,7 +260,7 @@ static INLINE void potential_strip1(struct MeshConfig *conf, struct MD *a)
 				y_old = y;
 			}
 
-			a->buf[i*(a->rows) + j] = sum * 0.5;
+			a->buf[i*(a->rows) + j] = sum * -0.5;
 		}
 
 		/* from strip[1] */
@@ -305,7 +305,7 @@ static INLINE void potential_strip1(struct MeshConfig *conf, struct MD *a)
 				y_old = y;
 			}
 
-			a->buf[i*(a->rows) + j] = sum * 0.5;
+			a->buf[i*(a->rows) + j] = sum * -0.5;
 		}
 
 		/* from dielectric[1] */
@@ -343,7 +343,7 @@ static INLINE void potential_strip1(struct MeshConfig *conf, struct MD *a)
 				y_old = y;
 			}
 
-			a->buf[i*(a->rows) + j] = sum * 0.5;
+			a->buf[i*(a->rows) + j] = sum * -0.5;
 		}
 	}
 }
