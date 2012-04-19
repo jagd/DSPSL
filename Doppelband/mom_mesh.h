@@ -1,6 +1,8 @@
 #ifndef __MOM_MESH_H__
 #define __MOM_MESH_H__
 
+/* #define MOM_MESH_ENABLE_DEBUG */
+
 /*
 
            The Port
@@ -29,13 +31,13 @@
 #define ID_STRIP1_END		2
 #define ID_STRIP_END		2
 #define ID_DIELECTRIC_START	2
-#define ID_DIELECTRIC0_START	3
-#define ID_DIELECTRIC0_END	4
-#define ID_DIELECTRIC1_START	4
-#define ID_DIELECTRIC1_END	5
-#define ID_DIELECTRIC_END	5
-#define ID_MESH_CELLS		5
-#define INDEX_SIZE		6
+#define ID_DIELECTRIC0_START	2
+#define ID_DIELECTRIC0_END	3
+#define ID_DIELECTRIC1_START	3
+#define ID_DIELECTRIC1_END	4
+#define ID_DIELECTRIC_END	4
+#define ID_MESH_CELLS		4
+#define INDEX_SIZE		5
 
 
 struct Cell_1D {

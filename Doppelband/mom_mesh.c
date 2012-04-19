@@ -5,6 +5,7 @@
 #include "mom_mesh.h"
 
 #define error printf
+#define log printf
 #define INLINE inline
 
 struct Line_1D {
@@ -17,7 +18,6 @@ struct MeshState  { /* local state */
 	struct Line_1D port, strip[2];
 	struct MeshConfig *conf;
 	double mesh_step;
-	int max_cells;
 	int n; /* current cell index */
 };
 
@@ -63,6 +63,7 @@ static INLINE void mesh_calc_coord(struct MeshState *s)
 
 static INLINE void mesh_auto_predict(struct MeshState *s)
 {
+	int max_cells;
 	/* define the general mesh length */
 	s->mesh_step = fmin(s->h*0.2, (s->w[0] + s->w[1])*0.05);
 
@@ -70,12 +71,16 @@ static INLINE void mesh_auto_predict(struct MeshState *s)
 	/*
 	   12 edges, each has 2 extra mesh cell ==> 24 extra cells
 	*/
-	s->max_cells = ceil(
+	max_cells = ceil(
 		2 * (s->port.right - s->port.left)/s->mesh_step + 24 );
 
 	s->conf = (struct MeshConfig*)malloc(sizeof(struct MeshConfig));
 	s->conf->mesh = (struct Cell_1D*)malloc(
-			sizeof(struct Cell_1D) * s->max_cells);
+			sizeof(struct Cell_1D) * max_cells);
+
+#ifdef MOM_MESH_ENABLE_DEBUG
+	log("Predicted number of cells = %d\n", max_cells);
+#endif
 
 }
 
@@ -100,20 +105,22 @@ static INLINE void mesh_strip0(struct MeshState *s)
 
 	rest = s->w[0] - (segs*s->mesh_step);
 
-	l_short = rest * (3/16);
-	l_long = rest * (5/16);
+	l_short = rest * (3.0/16.0);
+	l_long = rest * (5.0/16.0);
 
 	x = s->strip[0].left;
 
 	/* refining left edge*/
 	cache = l_short * 0.5;
-	s->conf->mesh[s->n].centre = x + cache;
+	x += cache;
+	s->conf->mesh[s->n].centre = x;
 	s->conf->mesh[s->n].hw = cache;
 	x += cache;
 	s->n++;
 
 	cache = (l_long * 0.5);
-	s->conf->mesh[s->n].centre = x + cache;
+	x += cache;
+	s->conf->mesh[s->n].centre = x;
 	s->conf->mesh[s->n].hw = cache;
 	x += cache;
 	s->n++;
@@ -121,7 +128,8 @@ static INLINE void mesh_strip0(struct MeshState *s)
 	/* the normal segments */
 	cache = s->mesh_step * 0.5;
 	for (i = 0; i < segs; ++i) {
-		s->conf->mesh[s->n].centre = x + cache;
+		x += cache;
+		s->conf->mesh[s->n].centre = x;
 		s->conf->mesh[s->n].hw = cache;
 		x += cache;
 		s->n++;
@@ -129,13 +137,16 @@ static INLINE void mesh_strip0(struct MeshState *s)
 
 	/* refining right edge*/
 	cache = (l_long * 0.5);
-	s->conf->mesh[s->n].centre = x + cache;
+	x += cache;
+	s->conf->mesh[s->n].centre = x;
 	s->conf->mesh[s->n].hw = cache;
 	x += cache;
 	s->n++;
 
+
 	cache = l_short * 0.5;
-	s->conf->mesh[s->n].centre = x + cache;
+	x += cache;
+	s->conf->mesh[s->n].centre = x;
 	s->conf->mesh[s->n].hw = cache;
 	x += cache;
 	s->n++;
@@ -162,20 +173,22 @@ static INLINE void mesh_strip1(struct MeshState *s)
 
 	rest = s->w[1] - (segs*s->mesh_step);
 
-	l_short = rest * (3/16);
-	l_long = rest * (5/16);
+	l_short = rest * (3.0/16.0);
+	l_long = rest * (5.0/16.0);
 
 	x = s->strip[1].left;
 
 	/* refining left edge*/
 	cache = l_short * 0.5;
-	s->conf->mesh[s->n].centre = x + cache;
+	x += cache;
+	s->conf->mesh[s->n].centre = x;
 	s->conf->mesh[s->n].hw = cache;
 	x += cache;
 	s->n++;
 
 	cache = (l_long * 0.5);
-	s->conf->mesh[s->n].centre = x + cache;
+	x += cache;
+	s->conf->mesh[s->n].centre = x;
 	s->conf->mesh[s->n].hw = cache;
 	x += cache;
 	s->n++;
@@ -183,7 +196,8 @@ static INLINE void mesh_strip1(struct MeshState *s)
 	/* the normal segments */
 	cache = s->mesh_step * 0.5;
 	for (i = 0; i < segs; ++i) {
-		s->conf->mesh[s->n].centre = x + cache;
+		x += cache;
+		s->conf->mesh[s->n].centre = x;
 		s->conf->mesh[s->n].hw = cache;
 		x += cache;
 		s->n++;
@@ -191,13 +205,15 @@ static INLINE void mesh_strip1(struct MeshState *s)
 
 	/* refining right edge*/
 	cache = (l_long * 0.5);
-	s->conf->mesh[s->n].centre = x + cache;
+	x += cache;
+	s->conf->mesh[s->n].centre = x;
 	s->conf->mesh[s->n].hw = cache;
 	x += cache;
 	s->n++;
 
 	cache = l_short * 0.5;
-	s->conf->mesh[s->n].centre = x + cache;
+	x += cache;
+	s->conf->mesh[s->n].centre = x;
 	s->conf->mesh[s->n].hw = cache;
 	x += cache;
 	s->n++;
@@ -226,20 +242,22 @@ static INLINE void mesh_dielectric0_left(struct MeshState *s)
 
 	rest = w - (segs*s->mesh_step);
 
-	l_short = rest * (3/16);
-	l_long = rest * (5/16);
+	l_short = rest * (3.0/16.0);
+	l_long = rest * (5.0/16.0);
 
 	x = s->port.left;
 
 	/* refining left edge*/
 	cache = l_short * 0.5;
-	s->conf->mesh[s->n].centre = x + cache;
+	x += cache;
+	s->conf->mesh[s->n].centre = x;
 	s->conf->mesh[s->n].hw = cache;
 	x += cache;
 	s->n++;
 
 	cache = (l_long * 0.5);
-	s->conf->mesh[s->n].centre = x + cache;
+	x += cache;
+	s->conf->mesh[s->n].centre = x;
 	s->conf->mesh[s->n].hw = cache;
 	x += cache;
 	s->n++;
@@ -247,7 +265,8 @@ static INLINE void mesh_dielectric0_left(struct MeshState *s)
 	/* the normal segments */
 	cache = s->mesh_step * 0.5;
 	for (i = 0; i < segs; ++i) {
-		s->conf->mesh[s->n].centre = x + cache;
+		x += cache;
+		s->conf->mesh[s->n].centre = x;
 		s->conf->mesh[s->n].hw = cache;
 		x += cache;
 		s->n++;
@@ -255,13 +274,15 @@ static INLINE void mesh_dielectric0_left(struct MeshState *s)
 
 	/* refining right edge*/
 	cache = (l_long * 0.5);
-	s->conf->mesh[s->n].centre = x + cache;
+	x += cache;
+	s->conf->mesh[s->n].centre = x;
 	s->conf->mesh[s->n].hw = cache;
 	x += cache;
 	s->n++;
 
 	cache = l_short * 0.5;
-	s->conf->mesh[s->n].centre = x + cache;
+	x += cache;
+	s->conf->mesh[s->n].centre = x;
 	s->conf->mesh[s->n].hw = cache;
 	x += cache;
 	s->n++;
@@ -288,20 +309,22 @@ static INLINE void mesh_dielectric0_right(struct MeshState *s)
 
 	rest = w - (segs*s->mesh_step);
 
-	l_short = rest * (3/16);
-	l_long = rest * (5/16);
+	l_short = rest * (3.0/16.0);
+	l_long = rest * (5.0/16.0);
 
 	x = s->strip[0].right;
 
 	/* refining left edge*/
 	cache = l_short * 0.5;
-	s->conf->mesh[s->n].centre = x + cache;
+	x += cache;
+	s->conf->mesh[s->n].centre = x;
 	s->conf->mesh[s->n].hw = cache;
 	x += cache;
 	s->n++;
 
 	cache = (l_long * 0.5);
-	s->conf->mesh[s->n].centre = x + cache;
+	x += cache;
+	s->conf->mesh[s->n].centre = x;
 	s->conf->mesh[s->n].hw = cache;
 	x += cache;
 	s->n++;
@@ -309,7 +332,8 @@ static INLINE void mesh_dielectric0_right(struct MeshState *s)
 	/* the normal segments */
 	cache = s->mesh_step * 0.5;
 	for (i = 0; i < segs; ++i) {
-		s->conf->mesh[s->n].centre = x + cache;
+		x += cache;
+		s->conf->mesh[s->n].centre = x;
 		s->conf->mesh[s->n].hw = cache;
 		x += cache;
 		s->n++;
@@ -317,13 +341,15 @@ static INLINE void mesh_dielectric0_right(struct MeshState *s)
 
 	/* refining right edge*/
 	cache = (l_long * 0.5);
-	s->conf->mesh[s->n].centre = x + cache;
+	x += cache;
+	s->conf->mesh[s->n].centre = x;
 	s->conf->mesh[s->n].hw = cache;
 	x += cache;
 	s->n++;
 
 	cache = l_short * 0.5;
-	s->conf->mesh[s->n].centre = x + cache;
+	x += cache;
+	s->conf->mesh[s->n].centre = x;
 	s->conf->mesh[s->n].hw = cache;
 	x += cache;
 	s->n++;
@@ -352,20 +378,22 @@ static INLINE void mesh_dielectric1_left(struct MeshState *s)
 
 	rest = w - (segs*s->mesh_step);
 
-	l_short = rest * (3/16);
-	l_long = rest * (5/16);
+	l_short = rest * (3.0/16.0);
+	l_long = rest * (5.0/16.0);
 
 	x = s->port.left;
 
 	/* refining left edge*/
 	cache = l_short * 0.5;
-	s->conf->mesh[s->n].centre = x + cache;
+	x += cache;
+	s->conf->mesh[s->n].centre = x;
 	s->conf->mesh[s->n].hw = cache;
 	x += cache;
 	s->n++;
 
 	cache = (l_long * 0.5);
-	s->conf->mesh[s->n].centre = x + cache;
+	x += cache;
+	s->conf->mesh[s->n].centre = x;
 	s->conf->mesh[s->n].hw = cache;
 	x += cache;
 	s->n++;
@@ -373,7 +401,8 @@ static INLINE void mesh_dielectric1_left(struct MeshState *s)
 	/* the normal segments */
 	cache = s->mesh_step * 0.5;
 	for (i = 0; i < segs; ++i) {
-		s->conf->mesh[s->n].centre = x + cache;
+		x += cache;
+		s->conf->mesh[s->n].centre = x;
 		s->conf->mesh[s->n].hw = cache;
 		x += cache;
 		s->n++;
@@ -381,13 +410,15 @@ static INLINE void mesh_dielectric1_left(struct MeshState *s)
 
 	/* refining right edge*/
 	cache = (l_long * 0.5);
-	s->conf->mesh[s->n].centre = x + cache;
+	x += cache;
+	s->conf->mesh[s->n].centre = x;
 	s->conf->mesh[s->n].hw = cache;
 	x += cache;
 	s->n++;
 
 	cache = l_short * 0.5;
-	s->conf->mesh[s->n].centre = x + cache;
+	x += cache;
+	s->conf->mesh[s->n].centre = x;
 	s->conf->mesh[s->n].hw = cache;
 	x += cache;
 	s->n++;
@@ -414,20 +445,22 @@ static INLINE void mesh_dielectric1_right(struct MeshState *s)
 
 	rest = w - (segs*s->mesh_step);
 
-	l_short = rest * (3/16);
-	l_long = rest * (5/16);
+	l_short = rest * (3.0/16.0);
+	l_long = rest * (5.0/16.0);
 
 	x = s->strip[1].right;
 
 	/* refining left edge*/
 	cache = l_short * 0.5;
-	s->conf->mesh[s->n].centre = x + cache;
+	x += cache;
+	s->conf->mesh[s->n].centre = x;
 	s->conf->mesh[s->n].hw = cache;
 	x += cache;
 	s->n++;
 
 	cache = (l_long * 0.5);
-	s->conf->mesh[s->n].centre = x + cache;
+	x += cache;
+	s->conf->mesh[s->n].centre = x;
 	s->conf->mesh[s->n].hw = cache;
 	x += cache;
 	s->n++;
@@ -435,7 +468,8 @@ static INLINE void mesh_dielectric1_right(struct MeshState *s)
 	/* the normal segments */
 	cache = s->mesh_step * 0.5;
 	for (i = 0; i < segs; ++i) {
-		s->conf->mesh[s->n].centre = x + cache;
+		x += cache;
+		s->conf->mesh[s->n].centre = x;
 		s->conf->mesh[s->n].hw = cache;
 		x += cache;
 		s->n++;
@@ -443,13 +477,15 @@ static INLINE void mesh_dielectric1_right(struct MeshState *s)
 
 	/* refining right edge*/
 	cache = (l_long * 0.5);
-	s->conf->mesh[s->n].centre = x + cache;
+	x += cache;
+	s->conf->mesh[s->n].centre = x;
 	s->conf->mesh[s->n].hw = cache;
 	x += cache;
 	s->n++;
 
 	cache = l_short * 0.5;
-	s->conf->mesh[s->n].centre = x + cache;
+	x += cache;
+	s->conf->mesh[s->n].centre = x;
 	s->conf->mesh[s->n].hw = cache;
 	x += cache;
 	s->n++;
@@ -496,5 +532,23 @@ struct MeshConfig* mesh_new(
 
 	s.conf->index[ID_MESH_CELLS] = s.n;
 
+#ifdef MOM_MESH_ENABLE_DEBUG
+	log("Port = [ %lf\t%lf ]\n", s.port.left, s.port.right);
+	log("Strip[0] = [ %lf\t%lf ]\n", s.strip[0].left, s.strip[0].right);
+	log("Strip[1] = [ %lf\t%lf ]\n", s.strip[1].left, s.strip[1].right);
+	log("Used number of cells = %d\n", s.conf->index[ID_MESH_CELLS]);
+	log("Number of cells for strip[0] = %d\n",
+		s.conf->index[ID_STRIP0_END]
+		- s.conf->index[ID_STRIP0_START]);
+	log("Number of cells for strip[1] = %d\n",
+		s.conf->index[ID_STRIP1_END]
+		- s.conf->index[ID_STRIP1_START]);
+	log("Number of cells for dielectric[0] = %d\n",
+		s.conf->index[ID_DIELECTRIC0_END]
+		- s.conf->index[ID_DIELECTRIC0_START]);
+	log("Number of cells for dielectric[1] = %d\n",
+		s.conf->index[ID_DIELECTRIC1_END]
+		- s.conf->index[ID_DIELECTRIC1_START]);
+#endif
 	return s.conf;
 }
