@@ -533,22 +533,22 @@ struct MeshConfig* mesh_new(
 	s.conf->index[ID_MESH_CELLS] = s.n;
 
 #ifdef MOM_MESH_ENABLE_DEBUG
-	log("Port = [ %lf\t%lf ]\n", s.port.left, s.port.right);
-	log("Strip[0] = [ %lf\t%lf ]\n", s.strip[0].left, s.strip[0].right);
-	log("Strip[1] = [ %lf\t%lf ]\n", s.strip[1].left, s.strip[1].right);
 	log("Used number of cells = %d\n", s.conf->index[ID_MESH_CELLS]);
 	log("Number of cells for strip[0] = %d\n",
-		s.conf->index[ID_STRIP0_END]
-		- s.conf->index[ID_STRIP0_START]);
+	      s.conf->index[ID_STRIP0_END]
+	      - s.conf->index[ID_STRIP0_START]);
 	log("Number of cells for strip[1] = %d\n",
-		s.conf->index[ID_STRIP1_END]
-		- s.conf->index[ID_STRIP1_START]);
+	      s.conf->index[ID_STRIP1_END]
+	      - s.conf->index[ID_STRIP1_START]);
 	log("Number of cells for dielectric[0] = %d\n",
-		s.conf->index[ID_DIELECTRIC0_END]
-		- s.conf->index[ID_DIELECTRIC0_START]);
+	      s.conf->index[ID_DIELECTRIC0_END]
+	      - s.conf->index[ID_DIELECTRIC0_START]);
 	log("Number of cells for dielectric[1] = %d\n",
 		s.conf->index[ID_DIELECTRIC1_END]
 		- s.conf->index[ID_DIELECTRIC1_START]);
+	log("    Port = [ %le\t%le ]\n", s.port.left, s.port.right);
+	log("Strip[0] = [ %le\t%le ]\n", s.strip[0].left, s.strip[0].right);
+	log("Strip[1] = [ %le\t%le ]\n", s.strip[1].left, s.strip[1].right);
 #endif
 	return s.conf;
 }
