@@ -361,11 +361,13 @@ struct MD* mom_matrix_new(struct MeshConfig *conf)
 	a = md_init(conf->index[ID_MESH_CELLS],
 		conf->index[ID_MESH_CELLS]);
 
-md_fill(a, 0);
+	/* set 0 for the E equations,
+	 * they are lightly sparse */
+
+	md_fill(a, 0);
 
 	potential_equations(conf, a);
 
-md_dump(a);
 	// TODO: 
 	return a;
 }
