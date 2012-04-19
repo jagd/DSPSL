@@ -23,7 +23,7 @@ struct MeshState  { /* local state */
 };
 
 
-void MeshConfig_free(struct MeshConfig *m)
+void mesh_free(struct MeshConfig *m)
 {
 	if (m) {
 		if (m->mesh) {
@@ -89,7 +89,7 @@ static INLINE void mesh_strip0(struct MeshState *s)
 	double cache;
 
 	/* meshing the STRIP0 */
-	s->conf->index[ID_STRIP0_START] = 0;
+	s->conf->index[ID_STRIP0_START] = s->n;
 
 	segs = floor(s->w[0] / s->mesh_step);
 	if (segs > 0) { /* reserve some space for edge refining */
@@ -100,7 +100,7 @@ static INLINE void mesh_strip0(struct MeshState *s)
 
 	l_short = rest * (3/16);
 	l_long = rest * (5/16);
-	
+
 	x = s->strip[0].left;
 
 	/* refining left edge*/
@@ -139,6 +139,7 @@ static INLINE void mesh_strip0(struct MeshState *s)
 	s->n++;
 }
 
+
 static INLINE void mesh_strip1(struct MeshState *s)
 {
 	int i;
@@ -149,8 +150,8 @@ static INLINE void mesh_strip1(struct MeshState *s)
 	double l_short, l_long;
 	double cache;
 
-	/* meshing the STRIP0 */
-	s->conf->index[ID_STRIP1_START] = 0;
+	/* meshing the STRIP1 */
+	s->conf->index[ID_STRIP1_START] = s->n;
 
 	segs = floor(s->w[1] / s->mesh_step);
 	if (segs > 0) { /* reserve some space for edge refining */
@@ -161,7 +162,7 @@ static INLINE void mesh_strip1(struct MeshState *s)
 
 	l_short = rest * (3/16);
 	l_long = rest * (5/16);
-	
+
 	x = s->strip[1].left;
 
 	/* refining left edge*/
@@ -201,11 +202,262 @@ static INLINE void mesh_strip1(struct MeshState *s)
 }
 
 
+static INLINE void mesh_dielectric0_left(struct MeshState *s)
+{
+	int i;
+
+	int segs; /* segments in general mesh step */
+	double x;
+	double rest; /* the total length of refined edge for each element */
+	double l_short, l_long;
+	double cache;
+	double w;
+
+	s->conf->index[ID_DIELECTRIC0_START] = s->n;
+
+	w = s->strip[0].left - s->port.left;
+
+	segs = floor(w / s->mesh_step);
+	if (segs > 0) { /* reserve some space for edge refining */
+		--segs;
+	}
+
+	rest = w - (segs*s->mesh_step);
+
+	l_short = rest * (3/16);
+	l_long = rest * (5/16);
+
+	x = s->port.left;
+
+	/* refining left edge*/
+	cache = l_short * 0.5;
+	s->conf->mesh[s->n].centre = x + cache;
+	s->conf->mesh[s->n].hw = cache;
+	x += cache;
+	s->n++;
+
+	cache = (l_long * 0.5);
+	s->conf->mesh[s->n].centre = x + cache;
+	s->conf->mesh[s->n].hw = cache;
+	x += cache;
+	s->n++;
+
+	/* the normal segments */
+	cache = s->mesh_step * 0.5;
+	for (i = 0; i < segs; ++i) {
+		s->conf->mesh[s->n].centre = x + cache;
+		s->conf->mesh[s->n].hw = cache;
+		x += cache;
+		s->n++;
+	}
+
+	/* refining right edge*/
+	cache = (l_long * 0.5);
+	s->conf->mesh[s->n].centre = x + cache;
+	s->conf->mesh[s->n].hw = cache;
+	x += cache;
+	s->n++;
+
+	cache = l_short * 0.5;
+	s->conf->mesh[s->n].centre = x + cache;
+	s->conf->mesh[s->n].hw = cache;
+	x += cache;
+	s->n++;
+}
+
+
+static INLINE void mesh_dielectric0_right(struct MeshState *s)
+{
+	int i;
+
+	int segs; /* segments in general mesh step */
+	double x;
+	double rest; /* the total length of refined edge for each element */
+	double l_short, l_long;
+	double cache;
+	double w;
+
+	w = s->port.right - s->strip[0].right;
+
+	segs = floor(w / s->mesh_step);
+	if (segs > 0) { /* reserve some space for edge refining */
+		--segs;
+	}
+
+	rest = w - (segs*s->mesh_step);
+
+	l_short = rest * (3/16);
+	l_long = rest * (5/16);
+
+	x = s->strip[0].right;
+
+	/* refining left edge*/
+	cache = l_short * 0.5;
+	s->conf->mesh[s->n].centre = x + cache;
+	s->conf->mesh[s->n].hw = cache;
+	x += cache;
+	s->n++;
+
+	cache = (l_long * 0.5);
+	s->conf->mesh[s->n].centre = x + cache;
+	s->conf->mesh[s->n].hw = cache;
+	x += cache;
+	s->n++;
+
+	/* the normal segments */
+	cache = s->mesh_step * 0.5;
+	for (i = 0; i < segs; ++i) {
+		s->conf->mesh[s->n].centre = x + cache;
+		s->conf->mesh[s->n].hw = cache;
+		x += cache;
+		s->n++;
+	}
+
+	/* refining right edge*/
+	cache = (l_long * 0.5);
+	s->conf->mesh[s->n].centre = x + cache;
+	s->conf->mesh[s->n].hw = cache;
+	x += cache;
+	s->n++;
+
+	cache = l_short * 0.5;
+	s->conf->mesh[s->n].centre = x + cache;
+	s->conf->mesh[s->n].hw = cache;
+	x += cache;
+	s->n++;
+}
+
+
+static INLINE void mesh_dielectric1_left(struct MeshState *s)
+{
+	int i;
+
+	int segs; /* segments in general mesh step */
+	double x;
+	double rest; /* the total length of refined edge for each element */
+	double l_short, l_long;
+	double cache;
+	double w;
+
+	s->conf->index[ID_DIELECTRIC1_START] = s->n;
+
+	w = s->strip[1].left - s->port.left;
+
+	segs = floor(w / s->mesh_step);
+	if (segs > 0) { /* reserve some space for edge refining */
+		--segs;
+	}
+
+	rest = w - (segs*s->mesh_step);
+
+	l_short = rest * (3/16);
+	l_long = rest * (5/16);
+
+	x = s->port.left;
+
+	/* refining left edge*/
+	cache = l_short * 0.5;
+	s->conf->mesh[s->n].centre = x + cache;
+	s->conf->mesh[s->n].hw = cache;
+	x += cache;
+	s->n++;
+
+	cache = (l_long * 0.5);
+	s->conf->mesh[s->n].centre = x + cache;
+	s->conf->mesh[s->n].hw = cache;
+	x += cache;
+	s->n++;
+
+	/* the normal segments */
+	cache = s->mesh_step * 0.5;
+	for (i = 0; i < segs; ++i) {
+		s->conf->mesh[s->n].centre = x + cache;
+		s->conf->mesh[s->n].hw = cache;
+		x += cache;
+		s->n++;
+	}
+
+	/* refining right edge*/
+	cache = (l_long * 0.5);
+	s->conf->mesh[s->n].centre = x + cache;
+	s->conf->mesh[s->n].hw = cache;
+	x += cache;
+	s->n++;
+
+	cache = l_short * 0.5;
+	s->conf->mesh[s->n].centre = x + cache;
+	s->conf->mesh[s->n].hw = cache;
+	x += cache;
+	s->n++;
+}
+
+
+static INLINE void mesh_dielectric1_right(struct MeshState *s)
+{
+	int i;
+
+	int segs; /* segments in general mesh step */
+	double x;
+	double rest; /* the total length of refined edge for each element */
+	double l_short, l_long;
+	double cache;
+	double w;
+
+	w = s->port.right - s->strip[1].right;
+
+	segs = floor(w / s->mesh_step);
+	if (segs > 0) { /* reserve some space for edge refining */
+		--segs;
+	}
+
+	rest = w - (segs*s->mesh_step);
+
+	l_short = rest * (3/16);
+	l_long = rest * (5/16);
+
+	x = s->strip[1].right;
+
+	/* refining left edge*/
+	cache = l_short * 0.5;
+	s->conf->mesh[s->n].centre = x + cache;
+	s->conf->mesh[s->n].hw = cache;
+	x += cache;
+	s->n++;
+
+	cache = (l_long * 0.5);
+	s->conf->mesh[s->n].centre = x + cache;
+	s->conf->mesh[s->n].hw = cache;
+	x += cache;
+	s->n++;
+
+	/* the normal segments */
+	cache = s->mesh_step * 0.5;
+	for (i = 0; i < segs; ++i) {
+		s->conf->mesh[s->n].centre = x + cache;
+		s->conf->mesh[s->n].hw = cache;
+		x += cache;
+		s->n++;
+	}
+
+	/* refining right edge*/
+	cache = (l_long * 0.5);
+	s->conf->mesh[s->n].centre = x + cache;
+	s->conf->mesh[s->n].hw = cache;
+	x += cache;
+	s->n++;
+
+	cache = l_short * 0.5;
+	s->conf->mesh[s->n].centre = x + cache;
+	s->conf->mesh[s->n].hw = cache;
+	x += cache;
+	s->n++;
+}
+
 /*
    near the edge, mesh will be finer,
    the general mesh_step will be divided into  3/8 and 5/8
 */
-struct MeshConfig* generate_mesh(
+struct MeshConfig* mesh_new(
 		double w0, /* strip0.width */
 		double w1, /* strip1.width */
 		double offset, /* offset of the centre of both strip */
@@ -234,6 +486,13 @@ struct MeshConfig* generate_mesh(
 
 	mesh_strip0(&s);
 	mesh_strip1(&s);
+
+	mesh_dielectric0_left(&s);
+	mesh_dielectric0_right(&s);
+	mesh_dielectric1_left(&s);
+	mesh_dielectric1_right(&s);
+
+	s.conf->index[ID_MESH_CELLS] = s.n;
 
 	return NULL;
 }

@@ -29,10 +29,10 @@
 #define ID_STRIP1_END		2
 #define ID_STRIP_END		2
 #define ID_DIELECTRIC_START	2
-#define ID_DIELECTRIC1_START	3
-#define ID_DIELECTRIC1_END	4
-#define ID_DIELECTRIC2_START	4
-#define ID_DIELECTRIC2_END	5
+#define ID_DIELECTRIC0_START	3
+#define ID_DIELECTRIC0_END	4
+#define ID_DIELECTRIC1_START	4
+#define ID_DIELECTRIC1_END	5
 #define ID_DIELECTRIC_END	5
 #define ID_MESH_CELLS		5
 #define INDEX_SIZE		6
@@ -47,5 +47,16 @@ struct MeshConfig {
 	int index[INDEX_SIZE];
 	struct Cell_1D *mesh;
 };
+
+
+struct MeshConfig* mesh_new(
+		double w0, /* strip0.width */
+		double w1, /* strip1.width */
+		double offset, /* offset of the centre of both strip */
+		double w_port_ext, /* extend width in both side */
+		double h /* only for determination of the mesh length */
+		);
+
+void mesh_free(struct MeshConfig *m);
 
 #endif
