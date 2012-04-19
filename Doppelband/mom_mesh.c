@@ -550,5 +550,6 @@ struct MeshConfig* mesh_new(
 	log("Strip[0] = [ %le\t%le ]\n", s.strip[0].left, s.strip[0].right);
 	log("Strip[1] = [ %le\t%le ]\n", s.strip[1].left, s.strip[1].right);
 #endif
+
 	return s.conf;
 }
