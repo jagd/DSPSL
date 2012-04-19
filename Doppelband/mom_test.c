@@ -47,9 +47,28 @@ void test_mesh()
 	mesh_free(conf);
 }
 
+void test_matrix()
+{
+	struct MeshConfig *conf;
+	struct MD *a;
+	/* int i; */
+
+	conf = mesh_new(
+		2.4e-3, 5e-3,
+		0,
+		3e-3,
+		0.79e-3
+		);
+
+	a = mom_matrix_new(conf);	
+
+	mesh_free(conf);
+
+	md_free(a);
+}
 
 int main()
 {
-	test_mesh();
+	test_matrix();
 	return 0;
 }

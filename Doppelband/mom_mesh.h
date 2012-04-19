@@ -46,6 +46,7 @@ struct Cell_1D {
 };
 
 struct MeshConfig {
+	double h;
 	int index[INDEX_SIZE];
 	struct Cell_1D *mesh;
 };

@@ -61,11 +61,11 @@ static INLINE void mesh_calc_coord(struct MeshState *s)
 }
 
 
-static INLINE void mesh_auto_predict(struct MeshState *s)
+static INLINE void mesh_auto_predict(struct MeshState *s, double h)
 {
 	int max_cells;
 	/* define the general mesh length */
-	s->mesh_step = fmin(s->h*0.2, (s->w[0] + s->w[1])*0.05);
+	s->mesh_step = fmin(h*0.2, (s->w[0] + s->w[1])*0.05);
 
 	/* consider the edge refine */
 	/*
@@ -513,12 +513,11 @@ struct MeshConfig* mesh_new(
 
 	s.w[0] = w0;
 	s.w[1] = w1;
-	s.h = h;
 	s.offset = offset;
 	s.w_port_ext = w_port_ext;
 
 	mesh_calc_coord(&s);
-	mesh_auto_predict(&s);
+	mesh_auto_predict(&s, h);
 
 	s.n = 0;
 
@@ -531,6 +530,7 @@ struct MeshConfig* mesh_new(
 	mesh_dielectric1_right(&s);
 
 	s.conf->index[ID_MESH_CELLS] = s.n;
+	s.conf->h = h;
 
 #ifdef MOM_MESH_ENABLE_DEBUG
 	log("Used number of cells = %d\n", s.conf->index[ID_MESH_CELLS]);

@@ -13,7 +13,7 @@ void md_dump(struct MD *m)
 	i = 0;
 	for (row = 0; row < m->rows; ++row) {
 		for (col = 0; col < m->cols; ++col) {
-			printf("%12.3lf", m->buf[i++]);
+			printf("%12.3le", m->buf[i++]);
 		}
 		putchar('\n');
 	}
