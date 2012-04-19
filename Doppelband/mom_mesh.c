@@ -14,7 +14,6 @@ struct Line_1D {
 
 struct MeshState  { /* local state */
 	double w[2], h, offset, w_port_ext;
-	double width; /* the total width */
 	struct Line_1D port, strip[2];
 	struct MeshConfig *conf;
 	double mesh_step;
@@ -36,24 +35,26 @@ void mesh_free(struct MeshConfig *m)
 
 static INLINE void mesh_calc_coord(struct MeshState *s)
 {
+	double width;
+
 	/* calculating the coordinates */
-	s->width = fmax(s->w[0]*0.5, s->w[1]*0.5 - s->offset) + s->offset
+	width = fmax(s->w[0]*0.5, s->w[1]*0.5 - s->offset) + s->offset
 				+ fmax(s->w[0]*0.5 - s->offset, s->w[1]*0.5);
 
-	s->port.left = -s->width*0.5 - s->w_port_ext;
-	s->port.right = s->width*0.5 + s->w_port_ext;
+	s->port.left = -width*0.5 - s->w_port_ext;
+	s->port.right = width*0.5 + s->w_port_ext;
 
-	s->strip[0].left = s->width*0.5
+	s->strip[0].left = width*0.5
 			- fmax(s->w[0]*0.5, s->w[1]*0.5 - s->offset)
 			- s->w[0]*0.5;
-	s->strip[0].right = s->width*0.5
+	s->strip[0].right = width*0.5
 			- fmax(s->w[0]*0.5, s->w[1]*0.5 - s->offset)
 			+ s->w[0]*0.5;
 
-	s->strip[1].left = -s->width*0.5
+	s->strip[1].left = -width*0.5
 			+ fmax(s->w[0]*0.5 - s->offset, s->w[1]*0.5)
 			- s->w[1]*0.5;
-	s->strip[1].right = -s->width*0.5
+	s->strip[1].right = -width*0.5
 			+ fmax(s->w[0]*0.5 - s->offset, s->w[1]*0.5)
 			+ s->w[1]*0.5;
 
@@ -69,7 +70,8 @@ static INLINE void mesh_auto_predict(struct MeshState *s)
 	/*
 	   12 edges, each has 2 extra mesh cell ==> 24 extra cells
 	*/
-	s->max_cells = ceil(2*s->width/s->mesh_step + 24);
+	s->max_cells = ceil(
+		2 * (s->port.right - s->port.left)/s->mesh_step + 24 );
 
 	s->conf = (struct MeshConfig*)malloc(sizeof(struct MeshConfig));
 	s->conf->mesh = (struct Cell_1D*)malloc(
@@ -494,5 +496,5 @@ struct MeshConfig* mesh_new(
 
 	s.conf->index[ID_MESH_CELLS] = s.n;
 
-	return NULL;
+	return s.conf;
 }
