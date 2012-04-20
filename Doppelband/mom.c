@@ -20,7 +20,10 @@
 
 #define INTEGRAL_STEPS 100
 
-static INLINE void potential_strip0(struct MeshConfig *conf, struct MD *a)
+static INLINE void potential_strip0(
+		struct MeshConfig *conf,
+		struct MD *a,
+		struct MD *k)
 {
 	double h = conf->h;
 	int i;
@@ -31,6 +34,8 @@ static INLINE void potential_strip0(struct MeshConfig *conf, struct MD *a)
 		double i_centre = conf->mesh[i].centre;
 		int j;
 
+		k->buf[i*k->cols + i] = (1 + conf->eps_r) * 0.5;
+
 		/* from strip[0] */
 		for (j = conf->index[ID_STRIP0_START];
 			j < conf->index[ID_STRIP0_END]; ++j) {
@@ -41,7 +46,7 @@ static INLINE void potential_strip0(struct MeshConfig *conf, struct MD *a)
 			double distance;
 
 			if (j == i) {
-				a->buf[i*(a->rows) + j] =
+				a->buf[i*(a->cols) + j] =
 					-CONST_INV_2_PI_EPS0 * 2.0
 					* conf->mesh[j].hw
 					* (log(conf->mesh[j].hw) - 1);
@@ -73,7 +78,7 @@ static INLINE void potential_strip0(struct MeshConfig *conf, struct MD *a)
 
 			sum += 0.5*(log(distance) - y);
 
-			a->buf[i*(a->rows) + j] = -CONST_INV_2_PI_EPS0*sum*dx;
+			a->buf[i*(a->cols) + j] = -CONST_INV_2_PI_EPS0*sum*dx;
 		}
 
 		/* from dielectric[0] */
@@ -110,7 +115,7 @@ static INLINE void potential_strip0(struct MeshConfig *conf, struct MD *a)
 
 			sum += 0.5*(log(distance) - y);
 
-			a->buf[i*(a->rows) + j] = -CONST_INV_2_PI_EPS0*sum*dx;
+			a->buf[i*(a->cols) + j] = -CONST_INV_2_PI_EPS0*sum*dx;
 		}
 
 		/* from strip[1] */
@@ -120,11 +125,14 @@ static INLINE void potential_strip0(struct MeshConfig *conf, struct MD *a)
 			/* variables for the integral */
 			/* `dx` always > 0*/
 			double x, dx, x_start, x_end, sum, y;
+			double y_k, sum_k;
 			double distance;
 
 			/* doing integral */
 			sum = 0;
 			y = 0;
+			sum_k = 0;
+			y_k = 0;
 
 			dx = conf->mesh[j].hw * 2.0 / INTEGRAL_STEPS;
 			x_end = conf->mesh[j].centre + conf->mesh[j].hw;
@@ -132,18 +140,24 @@ static INLINE void potential_strip0(struct MeshConfig *conf, struct MD *a)
 
 			for (x = x_start + dx; x <= x_end; x += dx) {
 				distance = x - i_centre;
-				distance = sqrt(distance*distance + h*h);
-				y = log(distance);
+				distance = (distance*distance + h*h);
 
+				y_k = h / distance;
+				sum_k += y_k;
+
+				y = log(sqrt(distance));
 				sum += y;
 			}
 
 			distance = x_start - i_centre;
-			distance = sqrt(distance*distance + h*h);
+			distance = (distance*distance + h*h);
 
-			sum += 0.5*(log(distance) - y);
+			sum_k += 0.5*((h/distance) - y_k);
+			sum += 0.5*(log(sqrt(distance)) - y);
 
-			a->buf[i*(a->rows) + j] = -CONST_INV_2_PI_EPS0*sum*dx;
+			k->buf[i*(k->cols) + j] = (1 - conf->eps_r)
+							/(2*M_PI)*sum_k*dx;
+			a->buf[i*(a->cols) + j] = -CONST_INV_2_PI_EPS0*sum*dx;
 		}
 
 		/* from dielectric[1] */
@@ -153,11 +167,14 @@ static INLINE void potential_strip0(struct MeshConfig *conf, struct MD *a)
 			/* variables for the integral */
 			/* `dx` always > 0*/
 			double x, dx, x_start, x_end, sum, y;
+			double y_k, sum_k;
 			double distance;
 
 			/* doing integral */
 			sum = 0;
 			y = 0;
+			sum_k = 0;
+			y_k = 0;
 
 			dx = conf->mesh[j].hw * 2.0 / INTEGRAL_STEPS;
 			x_end = conf->mesh[j].centre + conf->mesh[j].hw;
@@ -165,24 +182,34 @@ static INLINE void potential_strip0(struct MeshConfig *conf, struct MD *a)
 
 			for (x = x_start + dx; x <= x_end; x += dx) {
 				distance = x - i_centre;
-				distance = sqrt(distance*distance + h*h);
-				y = log(distance);
+				distance = (distance*distance + h*h);
 
+				y_k = h / distance;
+				sum_k += y_k;
+
+				y = log(sqrt(distance));
 				sum += y;
 			}
 
 			distance = x_start - i_centre;
-			distance = sqrt(distance*distance + h*h);
+			distance = (distance*distance + h*h);
 
-			sum += 0.5*(log(distance) - y);
+			sum_k += 0.5*((h/distance) - y_k);
+			sum += 0.5*(log(sqrt(distance)) - y);
 
-			a->buf[i*(a->rows) + j] = -CONST_INV_2_PI_EPS0*sum*dx;
+			k->buf[i*(k->cols) + j] = (1 - conf->eps_r)
+							/(2*M_PI)*sum_k*dx;
+			a->buf[i*(a->cols) + j] = -CONST_INV_2_PI_EPS0*sum*dx;
 		}
 	}
 }
 
 
-static INLINE void potential_strip1(struct MeshConfig *conf, struct MD *a)
+static INLINE void potential_strip1(
+		struct MeshConfig *conf,
+		struct MD *a,
+		struct MD *k)
+
 {
 	double h = conf->h;
 	int i;
@@ -193,6 +220,8 @@ static INLINE void potential_strip1(struct MeshConfig *conf, struct MD *a)
 		double i_centre = conf->mesh[i].centre;
 		int j;
 
+		k->buf[i*k->cols + i] = (1 + conf->eps_r) * 0.5;
+
 		/* from strip[0] */
 		for (j = conf->index[ID_STRIP0_START];
 			j < conf->index[ID_STRIP0_END]; ++j) {
@@ -200,11 +229,14 @@ static INLINE void potential_strip1(struct MeshConfig *conf, struct MD *a)
 			/* variables for the integral */
 			/* `dx` always > 0*/
 			double x, dx, x_start, x_end, sum, y;
+			double y_k, sum_k;
 			double distance;
 
 			/* doing integral */
 			sum = 0;
 			y = 0;
+			sum_k = 0;
+			y_k = 0;
 
 			dx = conf->mesh[j].hw * 2.0 / INTEGRAL_STEPS;
 			x_end = conf->mesh[j].centre + conf->mesh[j].hw;
@@ -212,18 +244,24 @@ static INLINE void potential_strip1(struct MeshConfig *conf, struct MD *a)
 
 			for (x = x_start + dx; x <= x_end; x += dx) {
 				distance = x - i_centre;
-				distance = sqrt(distance*distance + h*h);
-				y = log(distance);
+				distance = (distance*distance + h*h);
 
+				y_k = h / distance;
+				sum_k += y_k;
+
+				y = log(sqrt(distance));
 				sum += y;
 			}
 
 			distance = x_start - i_centre;
 			distance = sqrt(distance*distance + h*h);
 
+			sum_k += 0.5*((h/distance) - y_k);
 			sum += 0.5*(log(distance) - y);
 
-			a->buf[i*(a->rows) + j] = -CONST_INV_2_PI_EPS0*sum*dx;
+			k->buf[i*(k->cols) + j] = -(1 - conf->eps_r)
+							/(2*M_PI)*sum_k*dx;
+			a->buf[i*(a->cols) + j] = -CONST_INV_2_PI_EPS0*sum*dx;
 		}
 
 		/* from dielectric[0] */
@@ -233,11 +271,14 @@ static INLINE void potential_strip1(struct MeshConfig *conf, struct MD *a)
 			/* variables for the integral */
 			/* `dx` always > 0*/
 			double x, dx, x_start, x_end, sum, y;
+			double y_k, sum_k;
 			double distance;
 
 			/* doing integral */
 			sum = 0;
 			y = 0;
+			sum_k = 0;
+			y_k = 0;
 
 			dx = conf->mesh[j].hw * 2.0 / INTEGRAL_STEPS;
 			x_end = conf->mesh[j].centre + conf->mesh[j].hw;
@@ -245,18 +286,24 @@ static INLINE void potential_strip1(struct MeshConfig *conf, struct MD *a)
 
 			for (x = x_start + dx; x <= x_end; x += dx) {
 				distance = x - i_centre;
-				distance = sqrt(distance*distance + h*h);
-				y = log(distance);
+				distance = (distance*distance + h*h);
 
+				y_k = h / distance;
+				sum_k += y_k;
+
+				y = log(sqrt(distance));
 				sum += y;
 			}
 
 			distance = x_start - i_centre;
 			distance = sqrt(distance*distance + h*h);
 
+			sum_k += 0.5*((h/distance) - y_k);
 			sum += 0.5*(log(distance) - y);
 
-			a->buf[i*(a->rows) + j] = -CONST_INV_2_PI_EPS0*sum*dx;
+			k->buf[i*(k->cols) + j] = -(1 - conf->eps_r)
+							/(2*M_PI)*sum_k*dx;
+			a->buf[i*(a->cols) + j] = -CONST_INV_2_PI_EPS0*sum*dx;
 		}
 
 		/* from strip[1] */
@@ -269,7 +316,7 @@ static INLINE void potential_strip1(struct MeshConfig *conf, struct MD *a)
 			double distance;
 
 			if (j == i) {
-				a->buf[i*(a->rows) + j] =
+				a->buf[i*(a->cols) + j] =
 					-CONST_INV_2_PI_EPS0 * 2.0
 					* conf->mesh[j].hw
 					* (log(conf->mesh[j].hw) - 1);
@@ -301,7 +348,7 @@ static INLINE void potential_strip1(struct MeshConfig *conf, struct MD *a)
 
 			sum += 0.5*(log(distance) - y);
 
-			a->buf[i*(a->rows) + j] = -CONST_INV_2_PI_EPS0*sum*dx;
+			a->buf[i*(a->cols) + j] = -CONST_INV_2_PI_EPS0*sum*dx;
 		}
 
 		/* from dielectric[1] */
@@ -338,13 +385,16 @@ static INLINE void potential_strip1(struct MeshConfig *conf, struct MD *a)
 
 			sum += 0.5*(log(distance) - y);
 
-			a->buf[i*(a->rows) + j] = -CONST_INV_2_PI_EPS0*sum*dx;
+			a->buf[i*(a->cols) + j] = -CONST_INV_2_PI_EPS0*sum*dx;
 		}
 	}
 }
 
 
-static INLINE void potential_dielectric0(struct MeshConfig *conf, struct MD *a)
+static INLINE void potential_dielectric0(
+		struct MeshConfig *conf,
+		struct MD *a,
+		struct MD *k)
 {
 	double h = conf->h;
 	int i;
@@ -355,8 +405,10 @@ static INLINE void potential_dielectric0(struct MeshConfig *conf, struct MD *a)
 		double i_centre = conf->mesh[i].centre;
 		int j;
 
+		k->buf[i*k->cols + i] = (1 + conf->eps_r) * 0.5;
+
 		/* self */
-		a->buf[i*(a->rows) + i] = M_PI*(1+conf->eps_r)*(1-conf->eps_r);
+		a->buf[i*(a->cols) + i] = M_PI*(1+conf->eps_r)*(1-conf->eps_r);
 
 		/* from strip[1] */
 		for (j = conf->index[ID_STRIP1_START];
@@ -386,7 +438,9 @@ static INLINE void potential_dielectric0(struct MeshConfig *conf, struct MD *a)
 			distance = h / (distance*distance + h*h);
 			sum += 0.5*(distance - y);
 
-			a->buf[i*(a->rows) + j] = sum*dx;
+			k->buf[i*(k->cols) + j] = (1 - conf->eps_r)
+							/(2*M_PI)*sum*dx;
+			a->buf[i*(a->cols) + j] = sum*dx;
 		}
 
 		/* from dielectric[1] */
@@ -418,13 +472,18 @@ static INLINE void potential_dielectric0(struct MeshConfig *conf, struct MD *a)
 
 			sum += 0.5*(distance - y);
 
-			a->buf[i*(a->rows) + j] = sum*dx;
+			k->buf[i*(k->cols) + j] = (1 - conf->eps_r)
+							/(2*M_PI)*sum*dx;
+			a->buf[i*(a->cols) + j] = sum*dx;
 		}
 	}
 }
 
 
-static INLINE void potential_dielectric1(struct MeshConfig *conf, struct MD *a)
+static INLINE void potential_dielectric1(
+		struct MeshConfig *conf,
+		struct MD *a,
+		struct MD *k)
 {
 	double h = conf->h;
 	int i;
@@ -435,8 +494,10 @@ static INLINE void potential_dielectric1(struct MeshConfig *conf, struct MD *a)
 		double i_centre = conf->mesh[i].centre;
 		int j;
 
+		k->buf[i*k->cols + i] = (1 + conf->eps_r) * 0.5;
+
 		/* self */
-		a->buf[i*(a->rows) + i] = -M_PI*(1+conf->eps_r)*(1-conf->eps_r);
+		a->buf[i*(a->cols) + i] = -M_PI*(1+conf->eps_r)*(1-conf->eps_r);
 
 		/* from strip[0] */
 		for (j = conf->index[ID_STRIP0_START];
@@ -466,7 +527,9 @@ static INLINE void potential_dielectric1(struct MeshConfig *conf, struct MD *a)
 			distance = h / (distance*distance + h*h);
 			sum += 0.5*(distance - y);
 
-			a->buf[i*(a->rows) + j] = -sum*dx;
+			k->buf[i*(k->cols) + j] = (1 - conf->eps_r)
+							/(2*M_PI)*(-sum*dx);
+			a->buf[i*(a->cols) + j] = -sum*dx;
 		}
 
 		/* from dielectric[1] */
@@ -498,48 +561,60 @@ static INLINE void potential_dielectric1(struct MeshConfig *conf, struct MD *a)
 
 			sum += 0.5*(distance - y);
 
-			a->buf[i*(a->rows) + j] = -sum*dx;
+			k->buf[i*(k->cols) + j] = (1 - conf->eps_r)
+							/(2*M_PI)*(-sum*dx);
+			a->buf[i*(a->cols) + j] = -sum*dx;
 		}
 	}
 }
 
 
-static INLINE void potential_equations(struct MeshConfig *conf, struct MD *a)
+static INLINE void potential_equations(
+		struct MeshConfig *conf,
+		struct MD *a,
+		struct MD *k)
 {
-	potential_strip0(conf, a);
-	potential_strip1(conf, a);
-	potential_dielectric0(conf, a);
-	potential_dielectric1(conf, a);
+	potential_strip0(conf, a, k);
+	potential_strip1(conf, a, k);
+	potential_dielectric0(conf, a, k);
+	potential_dielectric1(conf, a, k);
 }
 
 
-struct MD* mom_matrix_new(struct MeshConfig *conf)
+/* the factor matrix k =  (free Charge) / (all charge) at each segment */
+static INLINE struct MD* mom_matrix_new(
+		struct MeshConfig *conf,
+		struct MD** p_k)
 {
-	struct MD *a;
+	struct MD *a, *k;
 
 	a = md_init(conf->index[ID_MESH_CELLS],
 		conf->index[ID_MESH_CELLS]);
-
 	/* set 0 for the E equations,
 	 * they are lightly sparse */
-
 	md_fill(a, 0);
 
-	potential_equations(conf, a);
+	k = md_init(conf->index[ID_MESH_CELLS],
+		conf->index[ID_MESH_CELLS]);
+	md_fill(k, 0);
 
+	potential_equations(conf, a, k);
+
+	*p_k = k;
 	return a;
 }
 
 
 struct MD* calc_charge(
 		struct MeshConfig *conf,
-		struct MD* a, /* will be dirty */
 		double charge[/* 2 */] )
 {
 	double q[2];
-	struct MD *b, *x;
+	struct MD *a, *k, *b, *x;
 	int i;
 	double pot[2];
+
+	a = mom_matrix_new(conf, &k);
 
 	b = md_init(a->cols, 1);
 	md_fill(b, 0);
@@ -575,6 +650,9 @@ struct MD* calc_charge(
 
 	charge[0] = q[0]*2;
 	charge[1] = q[1]*2;
+
+	md_free(a);
+	md_free(b);
 
 	return x;
 }
