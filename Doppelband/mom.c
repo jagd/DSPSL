@@ -42,7 +42,7 @@ static INLINE void potential_strip0(struct MeshConfig *conf, struct MD *a)
 
 			if (j == i) {
 				a->buf[i*(a->rows) + j] =
-					CONST_INV_2_PI_EPS0 * 2.0
+					-CONST_INV_2_PI_EPS0 * 2.0
 					* conf->mesh[j].hw
 					* (log(conf->mesh[j].hw) - 1);
 				continue;
@@ -270,7 +270,7 @@ static INLINE void potential_strip1(struct MeshConfig *conf, struct MD *a)
 
 			if (j == i) {
 				a->buf[i*(a->rows) + j] =
-					CONST_INV_2_PI_EPS0 * 2.0
+					-CONST_INV_2_PI_EPS0 * 2.0
 					* conf->mesh[j].hw
 					* (log(conf->mesh[j].hw) - 1);
 				continue;
