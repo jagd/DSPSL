@@ -73,7 +73,7 @@ static INLINE void potential_strip0(struct MeshConfig *conf, struct MD *a)
 
 			sum += 0.5*(log(distance) - y);
 
-			a->buf[i*(a->rows) + j] = -sum*dx;
+			a->buf[i*(a->rows) + j] = -CONST_INV_2_PI_EPS0*sum*dx;
 		}
 
 		/* from dielectric[0] */
@@ -110,7 +110,7 @@ static INLINE void potential_strip0(struct MeshConfig *conf, struct MD *a)
 
 			sum += 0.5*(log(distance) - y);
 
-			a->buf[i*(a->rows) + j] = -sum*dx;
+			a->buf[i*(a->rows) + j] = -CONST_INV_2_PI_EPS0*sum*dx;
 		}
 
 		/* from strip[1] */
@@ -143,7 +143,7 @@ static INLINE void potential_strip0(struct MeshConfig *conf, struct MD *a)
 
 			sum += 0.5*(log(distance) - y);
 
-			a->buf[i*(a->rows) + j] = -sum*dx;
+			a->buf[i*(a->rows) + j] = -CONST_INV_2_PI_EPS0*sum*dx;
 		}
 
 		/* from dielectric[1] */
@@ -176,7 +176,7 @@ static INLINE void potential_strip0(struct MeshConfig *conf, struct MD *a)
 
 			sum += 0.5*(log(distance) - y);
 
-			a->buf[i*(a->rows) + j] = -sum*dx;
+			a->buf[i*(a->rows) + j] = -CONST_INV_2_PI_EPS0*sum*dx;
 		}
 	}
 }
@@ -223,7 +223,7 @@ static INLINE void potential_strip1(struct MeshConfig *conf, struct MD *a)
 
 			sum += 0.5*(log(distance) - y);
 
-			a->buf[i*(a->rows) + j] = -sum*dx;
+			a->buf[i*(a->rows) + j] = -CONST_INV_2_PI_EPS0*sum*dx;
 		}
 
 		/* from dielectric[0] */
@@ -256,7 +256,7 @@ static INLINE void potential_strip1(struct MeshConfig *conf, struct MD *a)
 
 			sum += 0.5*(log(distance) - y);
 
-			a->buf[i*(a->rows) + j] = -sum*dx;
+			a->buf[i*(a->rows) + j] = -CONST_INV_2_PI_EPS0*sum*dx;
 		}
 
 		/* from strip[1] */
@@ -301,7 +301,7 @@ static INLINE void potential_strip1(struct MeshConfig *conf, struct MD *a)
 
 			sum += 0.5*(log(distance) - y);
 
-			a->buf[i*(a->rows) + j] = -sum*dx;
+			a->buf[i*(a->rows) + j] = -CONST_INV_2_PI_EPS0*sum*dx;
 		}
 
 		/* from dielectric[1] */
@@ -338,7 +338,7 @@ static INLINE void potential_strip1(struct MeshConfig *conf, struct MD *a)
 
 			sum += 0.5*(log(distance) - y);
 
-			a->buf[i*(a->rows) + j] = -sum*dx;
+			a->buf[i*(a->rows) + j] = -CONST_INV_2_PI_EPS0*sum*dx;
 		}
 	}
 }
@@ -531,7 +531,10 @@ struct MD* mom_matrix_new(struct MeshConfig *conf)
 }
 
 
-void calc_charge(struct MeshConfig *conf, struct MD* a, double charge[/* 2 */])
+struct MD* calc_charge(
+		struct MeshConfig *conf,
+		struct MD* a,
+		double charge[/* 2 */] )
 {
 	double q[2];
 	struct MD *b, *x;
@@ -568,4 +571,6 @@ void calc_charge(struct MeshConfig *conf, struct MD* a, double charge[/* 2 */])
 
 	charge[0] = q[0]*2;
 	charge[1] = q[1]*2;
+
+	return x;
 }

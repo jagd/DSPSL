@@ -51,7 +51,8 @@ void test_mesh()
 void test_matrix()
 {
 	struct MeshConfig *conf;
-	struct MD *a;
+	struct MD *a, *x;
+	int i;
 
 	double q[2];
 
@@ -65,13 +66,42 @@ void test_matrix()
 
 	a = mom_matrix_new(conf);
 
-	calc_charge(conf, a, q);
+	x = calc_charge(conf, a, q);
 
 	printf("Q[0] = %le\tQ[1] = %le\n", q[0], q[1]);
+
+	printf("# top\n");
+
+	for (i = conf->index[ID_STRIP0_START];
+		i < conf->index[ID_STRIP0_END]; ++i) {
+		printf("%le %le %le\n", conf->mesh[i].centre, x->buf[i]
+				, conf->mesh[i].hw);
+	}
+
+	for (i = conf->index[ID_DIELECTRIC0_START];
+		i < conf->index[ID_DIELECTRIC0_END]; ++i) {
+		printf("%le %le %le\n", conf->mesh[i].centre, x->buf[i]
+				, conf->mesh[i].hw);
+	}
+
+	printf("# bottom\n");
+
+	for (i = conf->index[ID_STRIP1_START];
+		i < conf->index[ID_STRIP1_END]; ++i) {
+		printf("%le %le %le\n", conf->mesh[i].centre, x->buf[i]
+				, conf->mesh[i].hw);
+	}
+
+	for (i = conf->index[ID_DIELECTRIC1_START];
+		i < conf->index[ID_DIELECTRIC1_END]; ++i) {
+		printf("%le %le %le\n", conf->mesh[i].centre, x->buf[i]
+				, conf->mesh[i].hw);
+	}
 
 	mesh_free(conf);
 
 	md_free(a);
+	md_free(x);
 }
 
 int main()
