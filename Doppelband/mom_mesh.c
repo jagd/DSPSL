@@ -500,7 +500,8 @@ struct MeshConfig* mesh_new(
 		double w1, /* strip1.width */
 		double offset, /* offset of the centre of both strip */
 		double w_port_ext, /* extend width in both side */
-		double h /* only for determination of the mesh length */
+		double h, /* only for determination of the mesh length */
+		double eps_r /* epsilon_r */
 		)
 {
 	struct MeshState s;
@@ -531,6 +532,7 @@ struct MeshConfig* mesh_new(
 
 	s.conf->index[ID_MESH_CELLS] = s.n;
 	s.conf->h = h;
+	s.conf->eps_r = eps_r;
 
 #ifdef MOM_MESH_ENABLE_DEBUG
 	log("Used number of cells = %d\n", s.conf->index[ID_MESH_CELLS]);

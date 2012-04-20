@@ -14,7 +14,8 @@ void test_mesh()
 		2.4e-3, 5e-3,
 		0,
 		3e-3,
-		0.79e-3
+		0.79e-3,
+		2.2
 		);
 
 	/*
@@ -57,7 +58,8 @@ void test_matrix()
 		2.4e-3, 5e-3,
 		0,
 		3e-3,
-		0.79e-3
+		0.79e-3,
+		2.2
 		);
 
 	a = mom_matrix_new(conf);	

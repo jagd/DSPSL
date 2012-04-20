@@ -47,6 +47,7 @@ struct Cell_1D {
 
 struct MeshConfig {
 	double h;
+	double eps_r;
 	int index[INDEX_SIZE];
 	struct Cell_1D *mesh;
 };
@@ -57,7 +58,8 @@ struct MeshConfig* mesh_new(
 		double w1, /* strip1.width */
 		double offset, /* offset of the centre of both strip */
 		double w_port_ext, /* extend width in both side */
-		double h /* only for determination of the mesh length */
+		double h, /* only for determination of the mesh length */
+		double eps_r /* epsilon_r */
 		);
 
 void mesh_free(struct MeshConfig *m);
