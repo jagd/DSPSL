@@ -256,7 +256,7 @@ struct MD* md_mul(struct MD *a, struct MD *b)
 			for (i = 0; i < a->cols; ++i) {
 				c->buf[row*c->cols + col] +=
 					a->buf[row*a->cols + i]
-					* b->buf[i*b->cols + row];
+					* b->buf[i*b->cols + col];
 			}
 		}
 	}

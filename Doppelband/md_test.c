@@ -3,7 +3,7 @@
 
 #include "md.h"
 
-void big_random()
+void inv_big_random()
 {
 	int size = 500;
 	struct MD *a;
@@ -22,7 +22,7 @@ void big_random()
 	md_free(a);
 }
 
-void small_random()
+void inv_small_random()
 {
 	int size = 50;
 	struct MD *a;
@@ -41,7 +41,7 @@ void small_random()
 	md_free(a);
 }
 
-void tiny()
+void inv_tiny()
 {
 	struct MD *a;
 
@@ -67,13 +67,49 @@ void tiny()
 	md_free(a);
 }
 
+void mul_tiny()
+{
+	struct MD *a, *b, *c;
+
+	a = md_init(2, 2);
+	md_fill(a, 0);
+	md_set(a, 0, 0, 1);
+	md_set(a, 0, 1, 2);
+	md_set(a, 1, 0, 3);
+	md_set(a, 1, 1, 4);
+
+	b = md_init(2, 1);
+	md_fill(b, 0);
+	md_set(b, 0, 0, 2);
+	md_set(b, 1, 0, 3);
+
+
+	printf("\nA =\n");
+	md_dump(a);
+
+	printf("\nB =\n");
+	md_dump(b);
+
+	printf("\nMultiplication result:\n");
+	c = md_mul(a, b);
+	md_dump(c);
+
+	md_free(a);
+	md_free(b);
+	md_free(c);
+}
+
 int main()
 {
-	printf("=== tiny ===\n");
-	tiny();
-	printf("=== small ===\n");
-	small_random();
-	printf("=== big ===\n");
-	big_random();
+	printf("=== inversion tiny ===\n");
+	inv_tiny();
+	printf("=== inversion small ===\n");
+	inv_small_random();
+	printf("=== inversion big ===\n");
+	inv_big_random();
+
+	printf("=== mul tiny ===\n");
+	mul_tiny();
+
 	return 0;
 }
