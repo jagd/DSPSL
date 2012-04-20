@@ -529,3 +529,43 @@ struct MD* mom_matrix_new(struct MeshConfig *conf)
 
 	return a;
 }
+
+
+void calc_charge(struct MeshConfig *conf, struct MD* a, double charge[/* 2 */])
+{
+	double q[2];
+	struct MD *b, *x;
+	int i;
+
+	b = md_init(a->cols, 1);
+	md_fill(b, 0);
+
+	for (i = conf->index[ID_STRIP0_START];
+		i < conf->index[ID_STRIP0_END]; ++i) {
+		b->buf[i] = 1;
+	}
+
+	for (i = conf->index[ID_STRIP1_START];
+		i < conf->index[ID_STRIP1_END]; ++i) {
+		b->buf[i] = -1;
+	}
+
+	md_inverse_direct(a);
+	x = md_mul(a, b);
+
+	q[0] = 0;
+	q[1] = 0;
+
+	for (i = conf->index[ID_STRIP0_START];
+		i < conf->index[ID_STRIP0_END]; ++i) {
+		q[0] += conf->mesh[i].hw * x->buf[i];
+	}
+
+	for (i = conf->index[ID_STRIP1_START];
+		i < conf->index[ID_STRIP1_END]; ++i) {
+		q[1] += conf->mesh[i].hw * x->buf[i];
+	}
+
+	charge[0] = q[0]*2;
+	charge[1] = q[1]*2;
+}

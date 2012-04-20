@@ -18,6 +18,7 @@ void md_set(struct MD *m, int row, int col, double val);
 double md_get(struct MD *m, int row, int col);
 
 void md_inverse_direct(struct MD *m);
+struct MD* md_mul(struct MD *a, struct MD *b);
 
 #ifdef MD_ENABLE_DEBUG
 #define MD_ENABLE_RANGE_CHECKING 1

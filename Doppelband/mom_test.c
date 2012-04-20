@@ -52,7 +52,8 @@ void test_matrix()
 {
 	struct MeshConfig *conf;
 	struct MD *a;
-	/* int i; */
+
+	double q[2];
 
 	conf = mesh_new(
 		2.4e-3, 5e-3,
@@ -62,7 +63,11 @@ void test_matrix()
 		2.2
 		);
 
-	a = mom_matrix_new(conf);	
+	a = mom_matrix_new(conf);
+
+	calc_charge(conf, a, q);
+
+	printf("Q[0] = %le\tQ[1] = %le\n", q[0], q[1]);
 
 	mesh_free(conf);
 

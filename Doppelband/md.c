@@ -234,3 +234,32 @@ void md_inverse_direct(struct MD *m)
 
 	free(row_exchange);
 }
+
+struct MD* md_mul(struct MD *a, struct MD *b)
+{
+	struct MD *c;
+
+	int row, col;
+
+#ifdef MD_ENABLE_RANGE_CHECKING
+	if (a->cols != b->rows) {
+		error("md_mul(): Uncorrect matrix dimension\n");
+	}
+#endif
+
+	c = md_init(a->rows, b->cols);
+
+	for (row = 0; row < c->rows; ++row) {
+		for (col = 0; col < c->cols; ++col) {
+			int i;
+			c->buf[row*c->cols + col] = 0;
+			for (i = 0; i < a->cols; ++i) {
+				c->buf[row*c->cols + col] +=
+					a->buf[row*a->cols + i]
+					* b->buf[i*b->cols + row];
+			}
+		}
+	}
+
+	return c;
+}
