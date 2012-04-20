@@ -64,6 +64,31 @@ void test_matrix()
 		2.2
 		);
 
+
+	printf("# config top\n");
+
+	for (i = conf->index[ID_STRIP0_START];
+		i < conf->index[ID_STRIP0_END]; ++i) {
+		printf("%le %le\n", conf->mesh[i].centre, 1/conf->mesh[i].hw);
+	}
+
+	for (i = conf->index[ID_DIELECTRIC0_START];
+		i < conf->index[ID_DIELECTRIC0_END]; ++i) {
+		printf("%le %le\n", conf->mesh[i].centre, -1/conf->mesh[i].hw);
+	}
+
+	printf("# config bottom\n");
+
+	for (i = conf->index[ID_STRIP1_START];
+		i < conf->index[ID_STRIP1_END]; ++i) {
+		printf("%le %le\n", conf->mesh[i].centre, 1/conf->mesh[i].hw);
+	}
+
+	for (i = conf->index[ID_DIELECTRIC1_START];
+		i < conf->index[ID_DIELECTRIC1_END]; ++i) {
+		printf("%le %le\n", conf->mesh[i].centre, -1/conf->mesh[i].hw);
+	}
+
 	a = mom_matrix_new(conf);
 
 	x = calc_charge(conf, a, q);

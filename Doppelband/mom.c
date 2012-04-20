@@ -58,7 +58,7 @@ static INLINE void potential_strip0(struct MeshConfig *conf, struct MD *a)
 
 			for (x = x_start + dx; x <= x_end; x += dx) {
 				distance = x - i_centre;
-				if (distance <= 0) {
+				if (distance < 0) {
 					distance = -distance;
 				}
 				y = log(distance);
@@ -67,7 +67,7 @@ static INLINE void potential_strip0(struct MeshConfig *conf, struct MD *a)
 			}
 
 			distance = x_start - i_centre;
-			if (distance <= 0) {
+			if (distance < 0) {
 				distance = -distance;
 			}
 
@@ -95,7 +95,7 @@ static INLINE void potential_strip0(struct MeshConfig *conf, struct MD *a)
 
 			for (x = x_start + dx; x <= x_end; x += dx) {
 				distance = x - i_centre;
-				if (distance <= 0) {
+				if (distance < 0) {
 					distance = -distance;
 				}
 				y = log(distance);
@@ -104,7 +104,7 @@ static INLINE void potential_strip0(struct MeshConfig *conf, struct MD *a)
 			}
 
 			distance = x_start - i_centre;
-			if (distance <= 0) {
+			if (distance < 0) {
 				distance = -distance;
 			}
 
@@ -286,7 +286,7 @@ static INLINE void potential_strip1(struct MeshConfig *conf, struct MD *a)
 
 			for (x = x_start + dx; x <= x_end; x += dx) {
 				distance = x - i_centre;
-				if (distance <= 0) {
+				if (distance < 0) {
 					distance = -distance;
 				}
 				y = log(distance);
@@ -295,7 +295,7 @@ static INLINE void potential_strip1(struct MeshConfig *conf, struct MD *a)
 			}
 
 			distance = x_start - i_centre;
-			if (distance <= 0) {
+			if (distance < 0) {
 				distance = -distance;
 			}
 
@@ -323,7 +323,7 @@ static INLINE void potential_strip1(struct MeshConfig *conf, struct MD *a)
 
 			for (x = x_start + dx; x <= x_end; x += dx) {
 				distance = x - i_centre;
-				if (distance <= 0) {
+				if (distance < 0) {
 					distance = -distance;
 				}
 				y = log(distance);
@@ -332,7 +332,7 @@ static INLINE void potential_strip1(struct MeshConfig *conf, struct MD *a)
 			}
 
 			distance = x_start - i_centre;
-			if (distance <= 0) {
+			if (distance < 0) {
 				distance = -distance;
 			}
 
@@ -533,24 +533,28 @@ struct MD* mom_matrix_new(struct MeshConfig *conf)
 
 struct MD* calc_charge(
 		struct MeshConfig *conf,
-		struct MD* a,
+		struct MD* a, /* will be dirty */
 		double charge[/* 2 */] )
 {
 	double q[2];
 	struct MD *b, *x;
 	int i;
+	double pot[2];
 
 	b = md_init(a->cols, 1);
 	md_fill(b, 0);
 
+	pot[0] = 1;
+	pot[1] = -1;
+
 	for (i = conf->index[ID_STRIP0_START];
 		i < conf->index[ID_STRIP0_END]; ++i) {
-		b->buf[i] = 1;
+		b->buf[i] = pot[0];
 	}
 
 	for (i = conf->index[ID_STRIP1_START];
 		i < conf->index[ID_STRIP1_END]; ++i) {
-		b->buf[i] = -1;
+		b->buf[i] = pot[1];
 	}
 
 	md_inverse_direct(a);
