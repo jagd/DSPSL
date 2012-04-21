@@ -4,8 +4,9 @@
 #include "mom_mesh.h"
 #include "md.h"
 
-struct MD* calc_charge(
-		struct MeshConfig *conf,
-		double charge[/* 2 */] );
+double mom(
+	struct MeshConfig *conf,
+	struct MD **cd_all, /* charge density for all charges */
+	struct MD **cd_free);
 
 #endif

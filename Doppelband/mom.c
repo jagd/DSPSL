@@ -605,22 +605,43 @@ static INLINE struct MD* mom_matrix_new(
 }
 
 
-struct MD* calc_charge(
-		struct MeshConfig *conf,
-		double charge[/* 2 */] )
+double mom(
+	struct MeshConfig *conf,
+	struct MD **cd_all, /* charge density for all charges */
+	struct MD **cd_free)
 {
 	double q[2];
-	struct MD *a, *k, *b, *x;
+	struct MD *a, *k, *b, *x, *x_free, *aux;
 	int i;
-	double pot[2];
+	double k1, k2, pot[2];
 
 	a = mom_matrix_new(conf, &k);
 
 	b = md_init(a->cols, 1);
 	md_fill(b, 0);
 
-	pot[0] = 1;
-	pot[1] = -1;
+
+	md_inverse_direct(a);  /* a is inversed */
+	aux = md_mul(k, a);
+
+	k1 = 0;
+	k2 = 0;
+
+	for (i = conf->index[ID_STRIP_START];
+		i < conf->index[ID_STRIP_END]; ++i) {
+		int j;
+		for (j = conf->index[ID_STRIP0_START];
+			j < conf->index[ID_STRIP0_END]; ++j) {
+			k1 += aux->buf[i*aux->cols + j] * conf->mesh[i].hw;
+		}
+		for (j = conf->index[ID_STRIP1_START];
+			j < conf->index[ID_STRIP1_END]; ++j) {
+			k2 += aux->buf[i*aux->cols + j] * conf->mesh[i].hw;
+		}
+	}
+
+	pot[0] = k2;
+	pot[1] = -k1;
 
 	for (i = conf->index[ID_STRIP0_START];
 		i < conf->index[ID_STRIP0_END]; ++i) {
@@ -632,27 +653,38 @@ struct MD* calc_charge(
 		b->buf[i] = pot[1];
 	}
 
-	md_inverse_direct(a);
 	x = md_mul(a, b);
+	x_free = md_mul(k, x);
 
 	q[0] = 0;
 	q[1] = 0;
 
 	for (i = conf->index[ID_STRIP0_START];
 		i < conf->index[ID_STRIP0_END]; ++i) {
-		q[0] += conf->mesh[i].hw * x->buf[i];
+		q[0] += conf->mesh[i].hw * x_free->buf[i];
 	}
 
 	for (i = conf->index[ID_STRIP1_START];
 		i < conf->index[ID_STRIP1_END]; ++i) {
-		q[1] += conf->mesh[i].hw * x->buf[i];
+		q[1] += conf->mesh[i].hw * x_free->buf[i];
 	}
-
-	charge[0] = q[0]*2;
-	charge[1] = q[1]*2;
 
 	md_free(a);
 	md_free(b);
+	md_free(k);
+	md_free(aux);
 
-	return x;
+	if (cd_all) {
+		*cd_all = x;
+	} else {
+		md_free(x);
+	}
+
+	if (cd_free) {
+		*cd_free = x_free;
+	} else {
+		md_free(x_free);
+	}
+
+	return 0;
 }
