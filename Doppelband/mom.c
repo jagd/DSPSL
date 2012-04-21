@@ -790,9 +790,7 @@ double mom(
 		md_free(x_free[1]);
 	}
 
-printf(">>> q[0][0] = %le , q[0][1] = %le\n    pot[0][0] = %le ,pot[0][1] = %le\n", q[0][0],  q[0][1], pot[0][0], pot[0][1]);
 	c[0] = q[0][0] / (pot[0][0] - pot[0][1]);
-printf(">>> q[1][0] = %le , q[1][1] = %le\n    pot[1][0] = %le ,pot[1][1] = %le\n", q[1][0],  q[1][1], pot[1][0], pot[1][1]);
 	c[1] = q[1][0] / (pot[1][0] - pot[1][1]);
 
 	if (capacity) {
