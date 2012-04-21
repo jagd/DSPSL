@@ -5,7 +5,7 @@
 #include "mom_mesh.h"
 
 #define error printf
-#define log printf
+#define trace printf
 #define INLINE inline
 
 struct Line_1D {
@@ -79,7 +79,7 @@ static INLINE void mesh_auto_predict(struct MeshState *s, double h)
 			sizeof(struct Cell_1D) * max_cells);
 
 #ifdef MOM_MESH_ENABLE_DEBUG
-	log("Predicted number of cells = %d\n", max_cells);
+	trace("Predicted number of cells = %d\n", max_cells);
 #endif
 
 }
@@ -535,22 +535,22 @@ struct MeshConfig* mesh_new(
 	s.conf->eps_r = eps_r;
 
 #ifdef MOM_MESH_ENABLE_DEBUG
-	log("Used number of cells = %d\n", s.conf->index[ID_MESH_CELLS]);
-	log("Number of cells for strip[0] = %d\n",
+	trace("Used number of cells = %d\n", s.conf->index[ID_MESH_CELLS]);
+	trace("Number of cells for strip[0] = %d\n",
 	      s.conf->index[ID_STRIP0_END]
 	      - s.conf->index[ID_STRIP0_START]);
-	log("Number of cells for strip[1] = %d\n",
+	trace("Number of cells for strip[1] = %d\n",
 	      s.conf->index[ID_STRIP1_END]
 	      - s.conf->index[ID_STRIP1_START]);
-	log("Number of cells for dielectric[0] = %d\n",
+	trace("Number of cells for dielectric[0] = %d\n",
 	      s.conf->index[ID_DIELECTRIC0_END]
 	      - s.conf->index[ID_DIELECTRIC0_START]);
-	log("Number of cells for dielectric[1] = %d\n",
+	trace("Number of cells for dielectric[1] = %d\n",
 		s.conf->index[ID_DIELECTRIC1_END]
 		- s.conf->index[ID_DIELECTRIC1_START]);
-	log("    Port = [ %le\t%le ]\n", s.port.left, s.port.right);
-	log("Strip[0] = [ %le\t%le ]\n", s.strip[0].left, s.strip[0].right);
-	log("Strip[1] = [ %le\t%le ]\n", s.strip[1].left, s.strip[1].right);
+	trace("    Port = [ %le\t%le ]\n", s.port.left, s.port.right);
+	trace("Strip[0] = [ %le\t%le ]\n", s.strip[0].left, s.strip[0].right);
+	trace("Strip[1] = [ %le\t%le ]\n", s.strip[1].left, s.strip[1].right);
 #endif
 
 	return s.conf;
