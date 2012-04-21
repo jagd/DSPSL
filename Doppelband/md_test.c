@@ -99,8 +99,22 @@ void mul_tiny()
 	md_free(c);
 }
 
+void eye(int n)
+{
+	struct MD *a;
+
+	a = md_eye(n);
+
+	printf("\neye :\n");
+	md_dump(a);
+
+	md_free(a);
+}
+
 int main()
 {
+	eye(5);
+
 	printf("=== inversion tiny ===\n");
 	inv_tiny();
 	printf("=== inversion small ===\n");

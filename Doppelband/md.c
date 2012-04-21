@@ -13,8 +13,8 @@ void md_dump(struct MD *m)
 	i = 0;
 	for (row = 0; row < m->rows; ++row) {
 		for (col = 0; col < m->cols; ++col) {
-			// printf("%12.3le", m->buf[i++]);
-			printf("%30.20le", m->buf[i++]);
+			printf("%12.3le", m->buf[i++]);
+			/* printf("%30.20le", m->buf[i++]); */
 		}
 		putchar('\n');
 	}
@@ -37,6 +37,25 @@ struct MD* md_init(int rows, int cols)
 
 	if ((m == 0) || (m->buf == 0)) {
 		error("md_init(): not enough memory\n");
+	}
+
+	return m;
+}
+
+struct MD* md_eye(int rows)
+{
+	int i;
+	struct MD *m;
+
+#ifdef MD_ENABLE_RANGE_CHECKING
+	if (rows <= 0) {
+		error("md_eye(): matrix size must be > 0\n");
+	}
+#endif
+	m = md_init(rows, rows);
+
+	for (i = 0; i < rows; ++i) {
+		m->buf[i*rows + i] = 1;
 	}
 
 	return m;

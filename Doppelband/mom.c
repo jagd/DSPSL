@@ -746,7 +746,8 @@ double mom(
 	a[1] = mom_matrix_new(conf, &k[1]);
 
 	a[0] = extract_freespace(conf, a[1]);
-	k[0] = extract_freespace(conf, k[1]);
+	// k[0] = extract_freespace(conf, k[1]);
+	k[0] = md_eye(conf->index[ID_STRIP_END]);
 
 	md_inverse_direct(a[0]);  /* a is inversed */
 	md_inverse_direct(a[1]);
