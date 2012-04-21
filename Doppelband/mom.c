@@ -259,7 +259,7 @@ static INLINE void potential_strip1(
 			sum_k += 0.5*((h/distance) - y_k);
 			sum += 0.5*(log(distance) - y);
 
-			k->buf[i*(k->cols) + j] = -(1 - conf->eps_r)
+			k->buf[i*(k->cols) + j] = (1 - conf->eps_r)
 							/(2*M_PI)*sum_k*dx;
 			a->buf[i*(a->cols) + j] = -CONST_INV_2_PI_EPS0*sum*dx;
 		}
@@ -301,7 +301,7 @@ static INLINE void potential_strip1(
 			sum_k += 0.5*((h/distance) - y_k);
 			sum += 0.5*(log(distance) - y);
 
-			k->buf[i*(k->cols) + j] = -(1 - conf->eps_r)
+			k->buf[i*(k->cols) + j] = (1 - conf->eps_r)
 							/(2*M_PI)*sum_k*dx;
 			a->buf[i*(a->cols) + j] = -CONST_INV_2_PI_EPS0*sum*dx;
 		}
@@ -528,11 +528,11 @@ static INLINE void potential_dielectric1(
 			sum += 0.5*(distance - y);
 
 			k->buf[i*(k->cols) + j] = (1 - conf->eps_r)
-							/(2*M_PI)*(-sum*dx);
+							/(2*M_PI)*(sum*dx);
 			a->buf[i*(a->cols) + j] = -sum*dx;
 		}
 
-		/* from dielectric[1] */
+		/* from dielectric[0] */
 		for (j = conf->index[ID_DIELECTRIC0_START];
 			j < conf->index[ID_DIELECTRIC0_END]; ++j) {
 
@@ -562,7 +562,7 @@ static INLINE void potential_dielectric1(
 			sum += 0.5*(distance - y);
 
 			k->buf[i*(k->cols) + j] = (1 - conf->eps_r)
-							/(2*M_PI)*(-sum*dx);
+							/(2*M_PI)*(sum*dx);
 			a->buf[i*(a->cols) + j] = -sum*dx;
 		}
 	}
@@ -627,22 +627,22 @@ static void calc_pot(
 		}
 		for (j = conf->index[ID_STRIP1_START];
 			j < conf->index[ID_STRIP1_END]; ++j) {
-			k2 += aux->buf[i*aux->cols + j] * hw;
+			k2 -= aux->buf[i*aux->cols + j] * hw;
 		}
 	}
 
-	/*
 	pot[0] = k2;
-	pot[1] = -k1;
-	*/
+	pot[1] = k1;
 
-	if (k1 < 1e-25) {
+	/*
+	if (fabs(k1) < 1e-25) {
 		pot[0] = 1;
 		pot[1] = 0;
 	} else {
 		pot[0] = 1;
-		pot[1] = -k2/k1;
+		pot[1] = k2/k1;
 	}
+	*/
 
 	md_free(aux);
 }
@@ -709,6 +709,8 @@ static void calc_charge(
 		i < conf->index[ID_STRIP1_END]; ++i) {
 		q[1] += conf->mesh[i].hw * x->buf[i];
 	}
+	q[0] *= 2;
+	q[1] *= 2;
 }
 
 double mom(
