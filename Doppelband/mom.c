@@ -5,6 +5,8 @@
 #include "mom_mesh.h"
 #include "md.h"
 
+#define mom_trace puts
+
 #define INLINE inline
 
 #ifndef M_PI
@@ -743,15 +745,17 @@ double mom(
 	   with the first index == 1, has a dielectric
 	*/
 
+	mom_trace("Filling matrix");
 	a[1] = mom_matrix_new(conf, &k[1]);
 
 	a[0] = extract_freespace(conf, a[1]);
-	// k[0] = extract_freespace(conf, k[1]);
 	k[0] = md_eye(conf->index[ID_STRIP_END]);
 
+	mom_trace("Inverting matrix");
 	md_inverse_direct(a[0]);  /* a is inversed */
 	md_inverse_direct(a[1]);
 
+	mom_trace("Extracting the result");
 	calc_pot(conf, a[0], k[0], pot[0]);
 	calc_pot(conf, a[1], k[1], pot[1]);
 
