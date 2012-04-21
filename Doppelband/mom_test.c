@@ -51,18 +51,27 @@ void test_mesh()
 void test_matrix()
 {
 	struct MeshConfig *conf;
+	/*
 	struct MD *x, *x_free;
 	int i;
+	*/
+	double c[2];
+	double z0;
 
 	conf = mesh_new(
-		2.4e-3, 5e-3,
+		2.4e-3, 10e-3,
 		0,
 		3e-3,
 		0.79e-3,
 		2.2
 		);
 
-	mom(conf, &x, &x_free);
+	z0 = mom(conf, NULL, NULL, c);
+
+	printf("C0 = %le F        C1 = %le F\n", c[0], c[1]);
+	printf("Z0 = %lf Ohm\n", z0);
+
+	/*
 
 	printf("# top all charges\n");
 
@@ -121,10 +130,11 @@ void test_matrix()
 	}
 
 
-	mesh_free(conf);
 
 	md_free(x);
 	md_free(x_free);
+	*/
+	mesh_free(conf);
 }
 
 int main()

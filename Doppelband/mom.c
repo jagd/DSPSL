@@ -604,44 +604,60 @@ static INLINE struct MD* mom_matrix_new(
 	return a;
 }
 
-
-double mom(
+static void calc_pot(
 	struct MeshConfig *conf,
-	struct MD **cd_all, /* charge density for all charges */
-	struct MD **cd_free)
+	struct MD *inv_a,
+	struct MD *k,
+	double pot[/*2*/]
+	)
 {
-	double q[2];
-	struct MD *a, *k, *b, *x, *x_free, *aux;
 	int i;
-	double k1, k2, pot[2];
+	struct MD *aux;
+	double k1 = 0, k2 = 0;
 
-	a = mom_matrix_new(conf, &k);
-
-	b = md_init(a->cols, 1);
-	md_fill(b, 0);
-
-
-	md_inverse_direct(a);  /* a is inversed */
-	aux = md_mul(k, a);
-
-	k1 = 0;
-	k2 = 0;
+	aux = md_mul(k, inv_a);
 
 	for (i = conf->index[ID_STRIP_START];
 		i < conf->index[ID_STRIP_END]; ++i) {
 		int j;
+		double hw = conf->mesh[i].hw;
 		for (j = conf->index[ID_STRIP0_START];
 			j < conf->index[ID_STRIP0_END]; ++j) {
-			k1 += aux->buf[i*aux->cols + j] * conf->mesh[i].hw;
+			k1 += aux->buf[i*aux->cols + j] * hw;
 		}
 		for (j = conf->index[ID_STRIP1_START];
 			j < conf->index[ID_STRIP1_END]; ++j) {
-			k2 += aux->buf[i*aux->cols + j] * conf->mesh[i].hw;
+			k2 += aux->buf[i*aux->cols + j] * hw;
 		}
 	}
 
+	/*
 	pot[0] = k2;
 	pot[1] = -k1;
+	*/
+
+	if (k1 < 1e-25) {
+		pot[0] = 1;
+		pot[1] = 0;
+	} else {
+		pot[0] = 1;
+		pot[1] = -k2/k1;
+	}
+
+	md_free(aux);
+}
+
+
+static struct MD* calc_b(
+	struct MeshConfig *conf,
+	struct MD *inv_a,
+	double pot[/*2*/])
+{
+	int i;
+	struct MD *b;
+
+	b = md_init(inv_a->cols, 1);
+	md_fill(b, 0);
 
 	for (i = conf->index[ID_STRIP0_START];
 		i < conf->index[ID_STRIP0_END]; ++i) {
@@ -653,38 +669,133 @@ double mom(
 		b->buf[i] = pot[1];
 	}
 
-	x = md_mul(a, b);
-	x_free = md_mul(k, x);
+	return b;
+}
 
+static INLINE struct MD* extract_freespace(
+	struct MeshConfig *conf,
+	struct MD *m)
+{
+	int i;
+	struct MD *m0;
+
+	m0 = md_init(conf->index[ID_STRIP_END], conf->index[ID_STRIP_END]);
+	for (i = 0; i < m0->rows; ++i) {
+		int j;
+		for (j = 0; j < m0->cols; ++j) {
+			m0->buf[i*m0->cols + j] = m->buf[i*m->cols + j];
+		}
+	}
+
+	return m0;
+}
+
+static void calc_charge(
+	struct MeshConfig *conf,
+	struct MD *x,
+	double q[]
+	)
+{
+	int i;
 	q[0] = 0;
 	q[1] = 0;
 
 	for (i = conf->index[ID_STRIP0_START];
 		i < conf->index[ID_STRIP0_END]; ++i) {
-		q[0] += conf->mesh[i].hw * x_free->buf[i];
+		q[0] += conf->mesh[i].hw * x->buf[i];
 	}
 
 	for (i = conf->index[ID_STRIP1_START];
 		i < conf->index[ID_STRIP1_END]; ++i) {
-		q[1] += conf->mesh[i].hw * x_free->buf[i];
+		q[1] += conf->mesh[i].hw * x->buf[i];
 	}
+}
 
-	md_free(a);
-	md_free(b);
-	md_free(k);
-	md_free(aux);
+double mom(
+	struct MeshConfig *conf,
+	/*
+	   charge density vector for freespace
+	   with cdfs[0] := only free charge
+	        cdfs[1] := all charge
+	   index range upto conf->index[ID_STRIP_END];
+	*/
+	struct MD **cdfs[], /* default NULL */
+	/*
+	   charge density vector with dielectric
+	   with cdd[0] := only free charge
+	        cdd[1] := all charge
+	   index range upto conf->index[ID_MESH_CELLS];
+	*/
+	struct MD **cdd[], /* default NULL */
+	double capacity[2] /* default NULL */
+	)
+{
+	double c[2];
+	double q[2][2];
+	struct MD *a[2], *k[2], *b[2], *x[2], *x_free[2];
+	double pot[2][2];
 
-	if (cd_all) {
-		*cd_all = x;
+	/*
+	   all the arrays except `cdfs` & `cdd`
+	   with the first index == 0, is in freespace
+	   with the first index == 1, has a dielectric
+	*/
+
+	a[1] = mom_matrix_new(conf, &k[1]);
+
+	a[0] = extract_freespace(conf, a[1]);
+	k[0] = extract_freespace(conf, k[1]);
+
+	md_inverse_direct(a[0]);  /* a is inversed */
+	md_inverse_direct(a[1]);
+
+	calc_pot(conf, a[0], k[0], pot[0]);
+	calc_pot(conf, a[1], k[1], pot[1]);
+
+	b[0] = calc_b(conf, a[0], pot[0]);
+	b[1] = calc_b(conf, a[1], pot[1]);
+
+	x[0] = md_mul(a[0], b[0]);
+	x[1] = md_mul(a[1], b[1]);
+
+	x_free[0] = md_mul(k[0], x[0]);
+	x_free[1] = md_mul(k[1], x[1]);
+
+	calc_charge(conf, x_free[0], q[0]);
+	calc_charge(conf, x_free[1], q[1]);
+
+	md_free(a[0]);
+	md_free(a[1]);
+	md_free(k[0]);
+	md_free(k[1]);
+	md_free(b[0]);
+	md_free(b[1]);
+
+	if (cdfs) {
+		*cdfs[0] = x_free[0];
+		*cdfs[1] = x[0];
 	} else {
-		md_free(x);
+		md_free(x[0]);
+		md_free(x_free[0]);
 	}
 
-	if (cd_free) {
-		*cd_free = x_free;
+	if (cdd) {
+		*cdd[0] = x_free[1];
+		*cdd[1] = x[1];
 	} else {
-		md_free(x_free);
+		md_free(x[1]);
+		md_free(x_free[1]);
 	}
 
-	return 0;
+printf(">>> q[0][0] = %le , q[0][1] = %le\n    pot[0][0] = %le ,pot[0][1] = %le\n", q[0][0],  q[0][1], pot[0][0], pot[0][1]);
+	c[0] = q[0][0] / (pot[0][0] - pot[0][1]);
+printf(">>> q[1][0] = %le , q[1][1] = %le\n    pot[1][0] = %le ,pot[1][1] = %le\n", q[1][0],  q[1][1], pot[1][0], pot[1][1]);
+	c[1] = q[1][0] / (pot[1][0] - pot[1][1]);
+
+	if (capacity) {
+		capacity[0] = c[0];
+		capacity[1] = c[1];
+	}
+
+	return 1/(C0*sqrt(c[0]*c[1]));
 }
