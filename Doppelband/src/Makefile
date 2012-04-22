@@ -1,8 +1,8 @@
-.PHONY: all clean
+.PHONY: all clean test
 
 CFLAGS:=-O3 -Wall $(CFLAGS)
 
-all: mom.o mom_mesh.o md.o
+all: mom.o mom_mesh.o md.o test
 
 mom.o: mom.c
 	$(CC) -c $(CFLAGS) $^ -o $@
