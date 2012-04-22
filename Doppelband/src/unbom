@@ -1,2 +1,2 @@
 #!/bin/sh
-sed -e 's/^\xef\xbb\xbf//' $*
+sed -i -e 's/^\xef\xbb\xbf//' $*
