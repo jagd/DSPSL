@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include "global.h"
 #include "md.h"
 
 #define error printf
@@ -144,7 +145,7 @@ void md_inverse_direct(struct MD *m)
 		row_exchange[row] = row; /* init */
 
 		for (row2 = row; row2 < m->rows; ++row2) {
-			int sum;
+			double sum;
 			double curr;
 			double unscale_val;
 
@@ -155,7 +156,7 @@ void md_inverse_direct(struct MD *m)
 
 			sum = 0;
 			for (col = row; col < m->cols; ++col) {
-				int val = m->buf[row2*m->cols + col];
+				double val = m->buf[row2*m->cols + col];
 				sum += val >= 0 ? val : -val; /* inline abs */
 			}
 

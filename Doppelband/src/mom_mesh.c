@@ -2,11 +2,11 @@
 #include <stdlib.h>
 #include <math.h>
 
+#include "global.h"
 #include "mom_mesh.h"
 
 #define error printf
 #define trace printf
-#define INLINE inline
 
 struct Line_1D {
 	double left, right;
@@ -71,7 +71,7 @@ static INLINE void mesh_auto_predict(struct MeshState *s, double h)
 	/*
 	   12 edges, each has 2 extra mesh cell ==> 24 extra cells
 	*/
-	max_cells = ceil(
+	max_cells = (int)ceil(
 		2 * (s->port.right - s->port.left)/s->mesh_step + 24 );
 
 	s->conf = (struct MeshConfig*)malloc(sizeof(struct MeshConfig));
@@ -98,7 +98,7 @@ static INLINE void mesh_strip0(struct MeshState *s)
 	/* meshing the STRIP0 */
 	s->conf->index[ID_STRIP0_START] = s->n;
 
-	segs = floor(s->w[0] / s->mesh_step);
+	segs = (int)floor(s->w[0] / s->mesh_step);
 	if (segs > 0) { /* reserve some space for edge refining */
 		--segs;
 	}
@@ -166,7 +166,7 @@ static INLINE void mesh_strip1(struct MeshState *s)
 	/* meshing the STRIP1 */
 	s->conf->index[ID_STRIP1_START] = s->n;
 
-	segs = floor(s->w[1] / s->mesh_step);
+	segs = (int)floor(s->w[1] / s->mesh_step);
 	if (segs > 0) { /* reserve some space for edge refining */
 		--segs;
 	}
@@ -235,7 +235,7 @@ static INLINE void mesh_dielectric0_left(struct MeshState *s)
 
 	w = s->strip[0].left - s->port.left;
 
-	segs = floor(w / s->mesh_step);
+	segs = (int)floor(w / s->mesh_step);
 	if (segs > 0) { /* reserve some space for edge refining */
 		--segs;
 	}
@@ -302,7 +302,7 @@ static INLINE void mesh_dielectric0_right(struct MeshState *s)
 
 	w = s->port.right - s->strip[0].right;
 
-	segs = floor(w / s->mesh_step);
+	segs = (int)floor(w / s->mesh_step);
 	if (segs > 0) { /* reserve some space for edge refining */
 		--segs;
 	}
@@ -371,7 +371,7 @@ static INLINE void mesh_dielectric1_left(struct MeshState *s)
 
 	w = s->strip[1].left - s->port.left;
 
-	segs = floor(w / s->mesh_step);
+	segs = (int)floor(w / s->mesh_step);
 	if (segs > 0) { /* reserve some space for edge refining */
 		--segs;
 	}
@@ -438,7 +438,7 @@ static INLINE void mesh_dielectric1_right(struct MeshState *s)
 
 	w = s->port.right - s->strip[1].right;
 
-	segs = floor(w / s->mesh_step);
+	segs = (int)floor(w / s->mesh_step);
 	if (segs > 0) { /* reserve some space for edge refining */
 		--segs;
 	}

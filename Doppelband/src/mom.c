@@ -2,12 +2,11 @@
 #include <stdlib.h>
 #include <math.h>
 
+#include "global.h"
 #include "mom_mesh.h"
 #include "md.h"
 
 void (*mom_trace)(char *) = NULL;
-
-#define INLINE inline
 
 #ifndef M_PI
 #define M_PI 3.14159265358979323846
@@ -642,7 +641,7 @@ static INLINE void calc_pot(
 		pot[1] = 0;
 	} else {
 		pot[0] = 1;
-		pot[1] = k2/k1;
+		pot[1] = k1/k2;
 	}
 	*/
 
