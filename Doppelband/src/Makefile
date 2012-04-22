@@ -1,8 +1,8 @@
-.PHONY: all clean test
+.PHONY: all ui clean test
 
 CFLAGS:=-O3 -Wall $(CFLAGS)
 
-all: mom.o mom_mesh.o md.o test
+all: mom.o mom_mesh.o md.o test ui
 
 mom.o: mom.c
 	$(CC) -c $(CFLAGS) $^ -o $@
@@ -25,3 +25,7 @@ clean:
 	-rm *.o
 	-rm mom_test md_test
 	-rm *.plot
+	-$(MAKE) -C ui clean
+
+ui:
+	$(MAKE) -C $@
