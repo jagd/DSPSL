@@ -5,6 +5,8 @@
 #include "mom_mesh.h"
 #include "mom.h"
 
+#define PATH_GNUPLOT "/usr/bin/gnuplot"
+
 void test_mesh()
 {
 	struct MeshConfig *conf;
@@ -18,43 +20,14 @@ void test_mesh()
 		2.2
 		);
 
-	/*
-	puts("#Strip[0]:");
-	for (i = conf->index[ID_STRIP0_START];
-		i < conf->index[ID_STRIP0_END]; ++i) {
-		printf("%le %le 2\n", conf->mesh[i].centre, conf->mesh[i].hw);
-	}
-
-	puts("#Dielectric[0]:");
-	for (i = conf->index[ID_DIELECTRIC0_START];
-		i < conf->index[ID_DIELECTRIC0_END]; ++i) {
-		printf("%le %le 1\n", conf->mesh[i].centre, conf->mesh[i].hw);
-	}
-
-
-	puts("#Strip[1]:");
-	for (i = conf->index[ID_STRIP1_START];
-		i < conf->index[ID_STRIP1_END]; ++i) {
-		printf("%le %le 2\n", conf->mesh[i].centre, conf->mesh[i].hw);
-	}
-
-	puts("#Dielectric[1]:");
-	for (i = conf->index[ID_DIELECTRIC1_START];
-		i < conf->index[ID_DIELECTRIC1_END]; ++i) {
-		printf("%le %le 1\n", conf->mesh[i].centre, conf->mesh[i].hw);
-	}
-	*/
-
 	mesh_free(conf);
 }
 
 void test_matrix()
 {
 	struct MeshConfig *conf;
-	/*
-	struct MD *x, *x_free;
+	struct MD *x[2];
 	int i;
-	*/
 	double c[2];
 	double z0;
 
@@ -66,79 +39,91 @@ void test_matrix()
 		2.2
 		);
 
-	z0 = mom(conf, NULL, NULL, c);
+	z0 = mom(conf, x, NULL, c);
 
 	printf("C0 = %le F        C1 = %le F\n", c[0], c[1]);
 	printf("Z0 = %lf Ohm\n", z0);
 
-	/*
 
+	printf("#!"PATH_GNUPLOT"\n");
 	printf("# top all charges\n");
+	printf("plot '-' notitle with impulse\n");
 
 	for (i = conf->index[ID_STRIP0_START];
 		i < conf->index[ID_STRIP0_END]; ++i) {
-		printf("%le %le %le\n", conf->mesh[i].centre, x->buf[i]
-				, conf->mesh[i].hw);
+		printf("%le %le\n", conf->mesh[i].centre, x[1]->buf[i]);
 	}
 
 	for (i = conf->index[ID_DIELECTRIC0_START];
 		i < conf->index[ID_DIELECTRIC0_END]; ++i) {
-		printf("%le %le %le\n", conf->mesh[i].centre, x->buf[i]
-				, conf->mesh[i].hw);
+		printf("%le %le\n", conf->mesh[i].centre, x[1]->buf[i]);
 	}
+	printf("e\npause -1\n");
 
 	printf("# bottom all charges\n");
+	printf("plot '-' notitle with impulse\n");
 
 	for (i = conf->index[ID_STRIP1_START];
 		i < conf->index[ID_STRIP1_END]; ++i) {
-		printf("%le %le %le\n", conf->mesh[i].centre, x->buf[i]
-				, conf->mesh[i].hw);
+		printf("%le %le\n", conf->mesh[i].centre, x[1]->buf[i]);
 	}
 
 	for (i = conf->index[ID_DIELECTRIC1_START];
 		i < conf->index[ID_DIELECTRIC1_END]; ++i) {
-		printf("%le %le %le\n", conf->mesh[i].centre, x->buf[i]
-				, conf->mesh[i].hw);
+		printf("%le %le\n", conf->mesh[i].centre, x[1]->buf[i]);
 	}
+	printf("e\npause -1\n");
 
 	printf("# top free charges\n");
+	printf("plot '-' notitle with impulse\n");
 
 	for (i = conf->index[ID_STRIP0_START];
 		i < conf->index[ID_STRIP0_END]; ++i) {
-		printf("%le %le %le\n", conf->mesh[i].centre, x_free->buf[i]
-				, conf->mesh[i].hw);
+		printf("%le %le\n", conf->mesh[i].centre, x[0]->buf[i]);
 	}
 
 	for (i = conf->index[ID_DIELECTRIC0_START];
 		i < conf->index[ID_DIELECTRIC0_END]; ++i) {
-		printf("%le %le %le\n", conf->mesh[i].centre, x_free->buf[i]
-				, conf->mesh[i].hw);
+		printf("%le %le\n", conf->mesh[i].centre, x[0]->buf[i]);
 	}
+	printf("e\npause -1\n");
 
 	printf("# bottom free charges\n");
+	printf("plot '-' notitle with impulse\n");
 
 	for (i = conf->index[ID_STRIP1_START];
 		i < conf->index[ID_STRIP1_END]; ++i) {
-		printf("%le %le %le\n", conf->mesh[i].centre, x_free->buf[i]
-				, conf->mesh[i].hw);
+		printf("%le %le\n", conf->mesh[i].centre, x[0]->buf[i]);
 	}
 
 	for (i = conf->index[ID_DIELECTRIC1_START];
 		i < conf->index[ID_DIELECTRIC1_END]; ++i) {
-		printf("%le %le %le\n", conf->mesh[i].centre, x_free->buf[i]
-				, conf->mesh[i].hw);
+		printf("%le %le\n", conf->mesh[i].centre, x[0]->buf[i]);
 	}
+	printf("e\npause -1\n");
 
 
 
-	md_free(x);
-	md_free(x_free);
-	*/
+	md_free(x[0]);
+	md_free(x[1]);
+
 	mesh_free(conf);
+}
+
+/*
+   wrap the puts function,
+   because its `const char*` parameter is not C89 compatible
+*/
+void trace(char *s)
+{
+	puts(s);
 }
 
 int main()
 {
+	mom_trace=trace;
+
 	test_matrix();
+
 	return 0;
 }

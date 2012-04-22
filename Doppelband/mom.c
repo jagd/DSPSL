@@ -5,7 +5,7 @@
 #include "mom_mesh.h"
 #include "md.h"
 
-#define mom_trace puts
+void (*mom_trace)(char *) = NULL;
 
 #define INLINE inline
 
@@ -625,11 +625,11 @@ static void calc_pot(
 		double hw = conf->mesh[i].hw;
 		for (j = conf->index[ID_STRIP0_START];
 			j < conf->index[ID_STRIP0_END]; ++j) {
-			k1 += aux->buf[i*aux->cols + j] * hw;
+			k1 -= aux->buf[i*aux->cols + j] * hw;
 		}
 		for (j = conf->index[ID_STRIP1_START];
 			j < conf->index[ID_STRIP1_END]; ++j) {
-			k2 -= aux->buf[i*aux->cols + j] * hw;
+			k2 += aux->buf[i*aux->cols + j] * hw;
 		}
 	}
 
@@ -723,14 +723,14 @@ double mom(
 	        cdfs[1] := all charge
 	   index range upto conf->index[ID_STRIP_END];
 	*/
-	struct MD **cdfs[], /* default NULL */
+	struct MD *cdfs[], /* default NULL */
 	/*
 	   charge density vector with dielectric
 	   with cdd[0] := only free charge
 	        cdd[1] := all charge
 	   index range upto conf->index[ID_MESH_CELLS];
 	*/
-	struct MD **cdd[], /* default NULL */
+	struct MD *cdd[], /* default NULL */
 	double capacity[2] /* default NULL */
 	)
 {
@@ -745,17 +745,26 @@ double mom(
 	   with the first index == 1, has a dielectric
 	*/
 
-	mom_trace("Filling matrix");
+	if (mom_trace) {
+		mom_trace("Filling matrix");
+	}
+
 	a[1] = mom_matrix_new(conf, &k[1]);
 
 	a[0] = extract_freespace(conf, a[1]);
 	k[0] = md_eye(conf->index[ID_STRIP_END]);
 
-	mom_trace("Inverting matrix");
+	if (mom_trace) {
+		mom_trace("Inverting matrix");
+	}
+
 	md_inverse_direct(a[0]);  /* a is inversed */
 	md_inverse_direct(a[1]);
 
-	mom_trace("Extracting the result");
+	if (mom_trace) {
+		mom_trace("Extracting the result");
+	}
+
 	calc_pot(conf, a[0], k[0], pot[0]);
 	calc_pot(conf, a[1], k[1], pot[1]);
 
@@ -779,16 +788,16 @@ double mom(
 	md_free(b[1]);
 
 	if (cdfs) {
-		*cdfs[0] = x_free[0];
-		*cdfs[1] = x[0];
+		cdfs[0] = x_free[0];
+		cdfs[1] = x[0];
 	} else {
 		md_free(x[0]);
 		md_free(x_free[0]);
 	}
 
 	if (cdd) {
-		*cdd[0] = x_free[1];
-		*cdd[1] = x[1];
+		cdd[0] = x_free[1];
+		cdd[1] = x[1];
 	} else {
 		md_free(x[1]);
 		md_free(x_free[1]);

@@ -4,6 +4,8 @@
 #include "mom_mesh.h"
 #include "md.h"
 
+extern void (*mom_trace)(char *);
+
 double mom(
 	struct MeshConfig *conf,
 	/*
@@ -12,14 +14,14 @@ double mom(
 	        cdfs[1] := all charge
 	   index range upto conf->index[ID_STRIP_END];
 	*/
-	struct MD **cdfs[], /* default NULL */
+	struct MD *cdfs[], /* default NULL */
 	/*
 	   charge density vector with dielectric
 	   with cdd[0] := only free charge
 	        cdd[1] := all charge
 	   index range upto conf->index[ID_MESH_CELLS];
 	*/
-	struct MD **cdd[], /* default NULL */
+	struct MD *cdd[], /* default NULL */
 	double capacity[2] /* default NULL */
 	);
 
