@@ -13,3 +13,4 @@ mom_test: mom_test.c mom.c mom_mesh.c md.c
 clean:
 	-rm *.o
 	-rm mom_test md_test
+	-rm *.plot
