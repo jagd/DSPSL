@@ -99,17 +99,9 @@ static void input()
 		}
 	}
 
-	while (1) {
-		printf("The offset `d` between the centre of both strips (in mm) = ");
-		scanf("%le", &d);
-		d *= 1e-3;
-
-		if (d < 1e-20) {
-			puts("`d` must be bigger than zero!");
-		} else {
-			break;
-		}
-	}
+	printf("The offset `d` between the centre of both strips (in mm) = ");
+	scanf("%le", &d);
+	d *= 1e-3;
 
 	while (1) {
 		printf("Relative permittivity = ");
