@@ -606,7 +606,7 @@ static INLINE struct MD* mom_matrix_new(
 	return a;
 }
 
-static void calc_pot(
+static INLINE void calc_pot(
 	struct MeshConfig *conf,
 	struct MD *inv_a,
 	struct MD *k,
@@ -650,7 +650,7 @@ static void calc_pot(
 }
 
 
-static struct MD* calc_b(
+static INLINE struct MD* calc_b(
 	struct MeshConfig *conf,
 	struct MD *inv_a,
 	double pot[/*2*/])
@@ -692,7 +692,7 @@ static INLINE struct MD* extract_freespace(
 	return m0;
 }
 
-static void calc_charge(
+static INLINE void calc_charge(
 	struct MeshConfig *conf,
 	struct MD *x,
 	double q[]
