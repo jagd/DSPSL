@@ -2,7 +2,18 @@
 
 CFLAGS:=-O3 -Wall $(CFLAGS)
 
-all: md_test mom_test
+all: mom.o mom_mesh.o md.o
+
+mom.o: mom.c
+	$(CC) -c $(CFLAGS) $^ -o $@
+
+mom_mesh.o: mom_mesh.c
+	$(CC) -c $(CFLAGS) $^ -o $@
+
+md.o: md.c
+	$(CC) -c $(CFLAGS) $^ -o $@
+
+test: md_test mom_test
 
 md_test: md_test.c md.c
 	$(CC) -D MD_ENABLE_DEBUG  $(CFLAGS) $^ -o $@
