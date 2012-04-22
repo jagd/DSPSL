@@ -39,7 +39,7 @@ void test_matrix()
 		2.2
 		);
 
-	z0 = mom(conf, x, NULL, c);
+	z0 = mom(conf, NULL, x, c);
 
 	printf("C0 = %le F        C1 = %le F\n", c[0], c[1]);
 	printf("Z0 = %lf Ohm\n", z0);
