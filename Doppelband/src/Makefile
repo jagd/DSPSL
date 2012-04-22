@@ -1,4 +1,4 @@
-.PHONY: all ui clean test
+.PHONY: tags all ui clean test
 
 CFLAGS:=-O3 -Wall $(CFLAGS)
 
@@ -22,6 +22,7 @@ mom_test: mom_test.c mom.c mom_mesh.c md.c
 	$(CC) -D MD_ENABLE_DEBUG -D MOM_MESH_ENABLE_DEBUG -lm $(CFLAGS) $^ -o $@
 
 clean:
+	-rm tags
 	-rm *.o
 	-rm mom_test md_test
 	-rm *.plot
@@ -29,3 +30,6 @@ clean:
 
 ui:
 	$(MAKE) -C $@
+
+tags:
+	ctags -R
