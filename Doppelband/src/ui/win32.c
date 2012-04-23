@@ -126,7 +126,7 @@ int Read(HWND hDlg)
 	GetDlgItemText(hDlg, IDC_EDIT_EPS, buf, TEXT_BUF_LENGTH);
 	swscanf_s(buf, TEXT("%le"), &eps_r);
 	if (eps_r < 1.2) {
-		error(TEXT("ERROR: too small ε_r"));
+		error(TEXT("ERROR: too small epsilon_r"));
 		return 1;
 	}
 

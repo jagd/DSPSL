@@ -65,7 +65,7 @@ static INLINE void mesh_auto_predict(struct MeshState *s, double h)
 {
 	int max_cells;
 	/* define the general mesh length */
-	s->mesh_step = fmin(h*0.1, (s->w[0] + s->w[1])*0.02);
+	s->mesh_step = fmin(h*0.15, (s->w[0] + s->w[1])*0.025);
 
 	/* consider the edge refine */
 	/*
