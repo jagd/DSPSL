@@ -195,7 +195,7 @@ INT_PTR CALLBACK MainWndProc(
 }
 
 
-static inter_trace(TCHAR *msg)
+static void inter_trace(TCHAR *msg)
 {
 	/* OemToCharBuff(msg, buf, TEXT_BUF_LENGTH); */
 	trace(buf);
