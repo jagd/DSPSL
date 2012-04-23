@@ -78,6 +78,13 @@ DWORD WINAPI Calc(LPVOID lpParam)
 	swprintf_s(buf, TEXT_BUF_LENGTH, TEXT("Z0 = %lf Ohm\n"), z0);
 	trace(buf);
 
+	md_free(x[0]);
+	md_free(x[1]);
+	md_free(x0[0]);
+	md_free(x0[1]);
+
+	mesh_free(conf);
+
 	EnableWindow(lpParam, TRUE);
 
 	return 0;

@@ -228,8 +228,11 @@ void calc()
 
 		fclose(fplot);
 	}
+
 	md_free(x[0]);
 	md_free(x[1]);
+	md_free(x0[0]);
+	md_free(x0[1]);
 
 	mesh_free(conf);
 }

@@ -38,6 +38,8 @@ struct MD* md_init(int rows, int cols)
 
 	if ((m == 0) || (m->buf == 0)) {
 		error("md_init(): not enough memory\n");
+		free(m);
+		m = NULL;
 	}
 
 	return m;
@@ -265,6 +267,7 @@ struct MD* md_mul(struct MD *a, struct MD *b)
 #ifdef MD_ENABLE_RANGE_CHECKING
 	if (a->cols != b->rows) {
 		error("md_mul(): Uncorrect matrix dimension\n");
+		return NULL;
 	}
 #endif
 
