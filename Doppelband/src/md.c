@@ -4,8 +4,6 @@
 #include "global.h"
 #include "md.h"
 
-#define error printf
-
 #ifdef MD_ENABLE_DEBUG
 void md_dump(struct MD *m)
 {
@@ -14,8 +12,8 @@ void md_dump(struct MD *m)
 	i = 0;
 	for (row = 0; row < m->rows; ++row) {
 		for (col = 0; col < m->cols; ++col) {
-			printf("%12.3le", m->buf[i++]);
-			/* printf("%30.20le", m->buf[i++]); */
+			printf(TEXT("%12.3le"), m->buf[i++]);
+			/* printf(TEXT("%30.20le"), m->buf[i++]); */
 		}
 		putchar('\n');
 	}
@@ -27,8 +25,8 @@ struct MD* md_init(int rows, int cols)
 	struct MD *m;
 
 	if (rows <= 0 || cols <= 0) {
-		error("md_init():"
-			"number of rows and columns must be positive\n");
+		mom_error(TEXT("md_init():")
+			TEXT("number of rows and columns must be positive\n"));
 	}
 
 	m = (struct MD*)malloc(sizeof(struct MD));
@@ -37,7 +35,7 @@ struct MD* md_init(int rows, int cols)
 	m->buf = (double*)malloc(sizeof(double)*rows*cols);
 
 	if ((m == 0) || (m->buf == 0)) {
-		error("md_init(): not enough memory\n");
+		mom_error(TEXT("md_init(): not enough memory\n"));
 		free(m);
 		m = NULL;
 	}
@@ -52,7 +50,7 @@ struct MD* md_eye(int rows)
 
 #ifdef MD_ENABLE_RANGE_CHECKING
 	if (rows <= 0) {
-		error("md_eye(): matrix size must be > 0\n");
+		mom_error(TEXT("md_eye(): matrix size must be > 0\n"));
 	}
 #endif
 	m = md_init(rows, rows);
@@ -93,7 +91,7 @@ void md_set(struct MD *m, int row, int col, double val)
 #ifdef MD_ENABLE_RANGE_CHECKING
 	if ((row < 0 || row >= m->rows)
 		|| (col < 0 || col >= m->cols)) {
-		error("md_set(): index out of range\n");
+		mom_error(TEXT("md_set(): index out of range\n"));
 		return;
 	}
 #endif
@@ -106,7 +104,7 @@ double md_get(struct MD *m, int row, int col)
 #ifdef MD_ENABLE_RANGE_CHECKING
 	if ((row < 0 || row >= m->rows)
 		|| (col < 0 || col >= m->cols)) {
-		error("md_set(): index out of range\n");
+		mom_error(TEXT("md_set(): index out of range\n"));
 		return 0;
 	}
 #endif
@@ -121,7 +119,7 @@ void md_inverse_direct(struct MD *m)
 
 #ifdef MD_ENABLE_RANGE_CHECKING
 	if (m->rows != m->cols) {
-		error("md_inverse_direct(): Matrix must be square");
+		mom_error(TEXT("md_inverse_direct(): Matrix must be square"));
 		return;
 	}
 #endif
@@ -191,7 +189,7 @@ void md_inverse_direct(struct MD *m)
 
 #ifdef MD_ENABLE_DEBUG
 		if (pivot_val == 0) {
-			error("md_inverse_direct(): Matrix is singular\n");
+			mom_error(TEXT("md_inverse_direct(): Matrix is singular\n"));
 			return;
 		}
 #endif
@@ -266,7 +264,7 @@ struct MD* md_mul(struct MD *a, struct MD *b)
 
 #ifdef MD_ENABLE_RANGE_CHECKING
 	if (a->cols != b->rows) {
-		error("md_mul(): Uncorrect matrix dimension\n");
+		mom_error(TEXT("md_mul(): Uncorrect matrix dimension\n"));
 		return NULL;
 	}
 #endif

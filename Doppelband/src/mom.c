@@ -6,17 +6,6 @@
 #include "mom_mesh.h"
 #include "md.h"
 
-void (*mom_trace)(char *) = NULL;
-
-#ifndef M_PI
-#define M_PI 3.14159265358979323846
-#endif
-
-#define C0	3e8
-#define Z0	(120 * M_PI)
-#define MU0	(Z0 / C0)
-#define EPS0	(1 / (Z0*C0))
-
 #define CONST_INV_2_PI_EPS0	(1.0 / (2.0*M_PI*EPS0))
 
 #define INTEGRAL_STEPS 100
@@ -744,25 +733,19 @@ double mom(
 	   with the first index == 1, has a dielectric
 	*/
 
-	if (mom_trace) {
-		mom_trace("Filling matrix");
-	}
+	mom_trace(TEXT("Filling matrix"));
 
 	a[1] = mom_matrix_new(conf, &k[1]);
 
 	a[0] = extract_freespace(conf, a[1]);
 	k[0] = md_eye(conf->index[ID_STRIP_END]);
 
-	if (mom_trace) {
-		mom_trace("Inverting matrix");
-	}
+	mom_trace(TEXT("Inverting matrix"));
 
 	md_inverse_direct(a[0]);  /* a is inversed */
 	md_inverse_direct(a[1]);
 
-	if (mom_trace) {
-		mom_trace("Extracting the result");
-	}
+	mom_trace(TEXT("Extracting the result"));
 
 	calc_pot(conf, a[0], k[0], pot[0]);
 	calc_pot(conf, a[1], k[1], pot[1]);

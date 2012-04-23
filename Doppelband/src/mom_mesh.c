@@ -5,8 +5,10 @@
 #include "global.h"
 #include "mom_mesh.h"
 
-#define error printf
-#define trace printf
+#ifdef MOM_MESH_ENABLE_DEBUG
+#define DEBUG_BUF_SIZE 1000
+static TCHAR debug_buf[DEBUG_BUF_SIZE];
+#endif
 
 struct Line_1D {
 	double left, right;
@@ -79,7 +81,10 @@ static INLINE void mesh_auto_predict(struct MeshState *s, double h)
 			sizeof(struct Cell_1D) * max_cells);
 
 #ifdef MOM_MESH_ENABLE_DEBUG
-	trace("Predicted number of cells = %d\n", max_cells);
+	snprintf(debug_buf, DEBUG_BUF_SIZE
+			,TEXT("Predicted number of cells = %d\n")
+			, max_cells);
+	mom_trace(debug_buf);
 #endif
 
 }
@@ -508,7 +513,7 @@ struct MeshConfig* mesh_new(
 
 	/* check inputed parameters */
 	if (w0 <= 0 || w1 <= 0 || w_port_ext <= 0 || h <= 0) {
-		error("generate_mesh(): Illegal geometric length\n");
+		mom_error(TEXT("generate_mesh(): Illegal geometric length\n"));
 		return NULL;
 	}
 
@@ -535,22 +540,49 @@ struct MeshConfig* mesh_new(
 	s.conf->eps_r = eps_r;
 
 #ifdef MOM_MESH_ENABLE_DEBUG
-	trace("Used number of cells = %d\n", s.conf->index[ID_MESH_CELLS]);
-	trace("Number of cells for strip[0] = %d\n",
-	      s.conf->index[ID_STRIP0_END]
-	      - s.conf->index[ID_STRIP0_START]);
-	trace("Number of cells for strip[1] = %d\n",
-	      s.conf->index[ID_STRIP1_END]
-	      - s.conf->index[ID_STRIP1_START]);
-	trace("Number of cells for dielectric[0] = %d\n",
-	      s.conf->index[ID_DIELECTRIC0_END]
-	      - s.conf->index[ID_DIELECTRIC0_START]);
-	trace("Number of cells for dielectric[1] = %d\n",
-		s.conf->index[ID_DIELECTRIC1_END]
-		- s.conf->index[ID_DIELECTRIC1_START]);
-	trace("    Port = [ %le\t%le ]\n", s.port.left, s.port.right);
-	trace("Strip[0] = [ %le\t%le ]\n", s.strip[0].left, s.strip[0].right);
-	trace("Strip[1] = [ %le\t%le ]\n", s.strip[1].left, s.strip[1].right);
+	snprintf(debug_buf, DEBUG_BUF_SIZE
+			, TEXT("Used number of cells = %d\n")
+			, s.conf->index[ID_MESH_CELLS]);
+	mom_trace(debug_buf);
+
+	snprintf(debug_buf, DEBUG_BUF_SIZE
+			, TEXT("Number of cells for strip[0] = %d\n")
+			, s.conf->index[ID_STRIP0_END]
+				- s.conf->index[ID_STRIP0_START]);
+	mom_trace(debug_buf);
+
+	snprintf(debug_buf, DEBUG_BUF_SIZE
+			, TEXT("Number of cells for strip[1] = %d\n")
+			, s.conf->index[ID_STRIP1_END]
+				- s.conf->index[ID_STRIP1_START]);
+	mom_trace(debug_buf);
+
+	snprintf(debug_buf, DEBUG_BUF_SIZE
+			, TEXT("Number of cells for dielectric[0] = %d\n")
+	      		, s.conf->index[ID_DIELECTRIC0_END]
+				- s.conf->index[ID_DIELECTRIC0_START]);
+	mom_trace(debug_buf);
+
+	snprintf(debug_buf, DEBUG_BUF_SIZE
+			, TEXT("Number of cells for dielectric[1] = %d\n")
+			, s.conf->index[ID_DIELECTRIC1_END]
+				- s.conf->index[ID_DIELECTRIC1_START]);
+	mom_trace(debug_buf);
+
+	snprintf(debug_buf, DEBUG_BUF_SIZE
+			, TEXT("    Port = [ %le\t%le ]\n")
+			, s.port.left, s.port.right);
+	mom_trace(debug_buf);
+
+	snprintf(debug_buf, DEBUG_BUF_SIZE
+			, TEXT("Strip[0] = [ %le\t%le ]\n")
+			, s.strip[0].left, s.strip[0].right);
+	mom_trace(debug_buf);
+
+	snprintf(debug_buf, DEBUG_BUF_SIZE
+			,TEXT("Strip[1] = [ %le\t%le ]\n")
+			, s.strip[1].left, s.strip[1].right);
+	mom_trace(debug_buf);
 #endif
 
 	return s.conf;

@@ -29,7 +29,6 @@ double w1, w2, d, h, eps_r, port_ext;
 HWND hMainDlg;
 
 
-#define error trace
 static void trace(LPTSTR msg)
 {
 	SendDlgItemMessage(hMainDlg, IDC_LIST_RESULT,
@@ -102,14 +101,14 @@ int Read(HWND hDlg)
 	swscanf_s(buf, TEXT("%le"), &w1);
 	w1 *= 1e-3;
 	if (w1 < 1e-20) {
-		error(TEXT("ERROR: The value of `w1` must be > 0"));
+		mom_error(TEXT("ERROR: The value of `w1` must be > 0"));
 		return 1;
 	}
 
 	GetDlgItemText(hDlg, IDC_EDIT_W2, buf, TEXT_BUF_LENGTH);
 	swscanf_s(buf, TEXT("%le"), &w2);
 	if (w2 < 1e-20) {
-		error(TEXT("ERROR: The value of `w2` must be > 0"));
+		mom_error(TEXT("ERROR: The value of `w2` must be > 0"));
 		return 1;
 	}
 	w2 *= 1e-3;
@@ -117,7 +116,7 @@ int Read(HWND hDlg)
 	GetDlgItemText(hDlg, IDC_EDIT_H, buf, TEXT_BUF_LENGTH);
 	swscanf_s(buf, TEXT("%le"), &h);
 	if (h < 1e-20) {
-		error(TEXT("ERROR: The value of `h` must be > 0"));
+		mom_error(TEXT("ERROR: The value of `h` must be > 0"));
 		return 1;
 	}
 	h *= 1e-3;
@@ -125,7 +124,7 @@ int Read(HWND hDlg)
 	GetDlgItemText(hDlg, IDC_EDIT_PORT, buf, TEXT_BUF_LENGTH);
 	swscanf_s(buf, TEXT("%le"), &port_ext);
 	if (port_ext < 1e-20) {
-		error(TEXT("small `p` will be supported in the next version"));
+		mom_error(TEXT("small `p` will be supported in the next version"));
 		return 1;
 	}
 	port_ext *= 1e-3;
@@ -133,7 +132,7 @@ int Read(HWND hDlg)
 	GetDlgItemText(hDlg, IDC_EDIT_EPS, buf, TEXT_BUF_LENGTH);
 	swscanf_s(buf, TEXT("%le"), &eps_r);
 	if (eps_r < 1.2) {
-		error(TEXT("ERROR: too small epsilon_r"));
+		mom_error(TEXT("ERROR: too small epsilon_r"));
 		return 1;
 	}
 
@@ -196,9 +195,9 @@ INT_PTR CALLBACK MainWndProc(
 }
 
 
-static inter_trace(char *msg)
+static inter_trace(TCHAR *msg)
 {
-	OemToCharBuff(msg, buf, TEXT_BUF_LENGTH);
+	/* OemToCharBuff(msg, buf, TEXT_BUF_LENGTH); */
 	trace(buf);
 }
 
@@ -208,6 +207,7 @@ int WINAPI WinMain(HINSTANCE hInstance,
 		   int nShowCmd)
 {
 	mom_trace = inter_trace;
+	mom_error = mom_trace;
 
 	return DialogBoxParam(
 			hInstance,

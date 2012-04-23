@@ -4,8 +4,6 @@
 #include "mom_mesh.h"
 #include "md.h"
 
-extern void (*mom_trace)(char *);
-
 double mom(
 	struct MeshConfig *conf,
 	/*

@@ -3,7 +3,7 @@
 LINKER=$(CC)
 
 CFLAGS:=-O3 -Wall $(CFLAGS)
-DEPENDENCY:= ../mom.o ../mom_mesh.o ../md.o
+DEPENDENCY:= ../global.o ../mom.o ../mom_mesh.o ../md.o
 
 all: text
 

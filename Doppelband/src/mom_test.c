@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <math.h>
 
+#include "global.h"
 #include "mom_mesh.h"
 #include "mom.h"
 
