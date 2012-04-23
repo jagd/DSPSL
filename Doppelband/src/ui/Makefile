@@ -18,9 +18,10 @@ clean:
 	-rm *.o
 	-rm text
 	-rm plot.txt
-	-rm afxres.h *.res win32.exe win32.exe.so
+	-rm *.res *.exe *.exe.so
+	-rm afxres.h
 
 win32.exe: win32.c $(DEPENDENCY_SRC)
 	-ln -s fake_afxres.h afxres.h
 	wrc win32.rc
-	winegcc $(CFLAGS) -mwindows -mno-cygwin win32.res $^ -o $@
+	winegcc $(CFLAGS) -DUNICODE -mwindows -mno-cygwin win32.res $^ -o $@

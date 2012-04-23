@@ -70,7 +70,7 @@ DWORD WINAPI Calc(LPVOID lpParam)
 
 	z0 = mom(conf, x0, x, c);
 
-	swprintf(buf, TEXT_BUF_LENGTH,
+	swprintf_s(buf, TEXT_BUF_LENGTH,
 		TEXT("Effective permittivity = %lf\n"), c[1]/c[0]);
 	trace(buf);
 

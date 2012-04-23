@@ -15,7 +15,7 @@ typedef TCHAR* LPTSTR;
 #define INLINE inline
 #endif
 
-#ifdef _MSC_VER
+#ifdef _WIN32
 
 INLINE static double fmax(double a, double b)
 {
