@@ -4,16 +4,23 @@ LINKER=$(CC)
 
 CFLAGS:=-O3 -Wall $(CFLAGS)
 DEPENDENCY:= ../global.o ../mom.o ../mom_mesh.o ../md.o
+DEPENDENCY_SRC:= ../global.c ../mom.c ../mom_mesh.c ../md.c
 
-all: text
+all: text win32.exe
 
 text: text.o $(DEPENDENCY)
-	$(CC) -lm $^ -o $@
+	$(LINKER) -lm $^ -o $@
 
 text.o: text.c
-	$(LINKER) -c $(CFLAGS) $^ -o $@
+	$(CC) -c $(CFLAGS) $^ -o $@
 
 clean:
 	-rm *.o
 	-rm text
 	-rm plot.txt
+	-rm afxres.h *.res win32.exe win32.exe.so
+
+win32.exe: win32.c $(DEPENDENCY_SRC)
+	-ln -s fake_afxres.h afxres.h
+	wrc win32.rc
+	winegcc $(CFLAGS) -mwindows -mno-cygwin win32.res $^ -o $@
