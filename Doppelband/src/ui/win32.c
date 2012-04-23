@@ -197,8 +197,13 @@ INT_PTR CALLBACK MainWndProc(
 
 static void inter_trace(TCHAR *msg)
 {
-	/* OemToCharBuff(msg, buf, TEXT_BUF_LENGTH); */
+	/* for non-unicode */
+	/*
+	OemToCharBuff(msg, buf, TEXT_BUF_LENGTH);
 	trace(buf);
+	 */
+
+	trace(msg);
 }
 
 int WINAPI WinMain(HINSTANCE hInstance,
