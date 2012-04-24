@@ -594,6 +594,7 @@ static INLINE struct MD* mom_matrix_new(
 		conf->index[ID_MESH_CELLS]);
 
 	if (k == 0) {
+		md_free(a);
 		mom_trace(TEXT("Could not create matrix"));
 		return NULL;
 	}

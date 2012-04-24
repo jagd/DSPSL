@@ -63,7 +63,8 @@ static INLINE void mesh_calc_coord(struct MeshState *s)
 }
 
 
-static INLINE void mesh_auto_predict(struct MeshState *s, double h)
+/* return: success 0 else non-zero */
+static INLINE int mesh_auto_predict(struct MeshState *s, double h)
 {
 	int max_cells;
 	/* define the general mesh length */
@@ -81,7 +82,10 @@ static INLINE void mesh_auto_predict(struct MeshState *s, double h)
 			sizeof(struct Cell_1D) * max_cells);
 	if (s->conf == 0 || s->conf->mesh == 0) {
 		mom_error(TEXT("Create configuration failed"));
-		return;
+		if (s->conf) {
+			mesh_free(s->conf);
+		}
+		return 1;
 	}
 
 #ifdef MOM_MESH_ENABLE_DEBUG
@@ -90,7 +94,7 @@ static INLINE void mesh_auto_predict(struct MeshState *s, double h)
 			, max_cells);
 	mom_trace(debug_buf);
 #endif
-
+	return 0;
 }
 
 
@@ -517,7 +521,8 @@ struct MeshConfig* mesh_new(
 
 	/* check inputed parameters */
 	if (w0 <= 0 || w1 <= 0 || w_port_ext <= 0 || h <= 0) {
-		mom_error(TEXT("generate_mesh(): Illegal geometric length\n"));
+		mom_error(TEXT("generate_mesh(): ")
+				TEXT("Illegal geometric length"));
 		return NULL;
 	}
 
@@ -527,7 +532,11 @@ struct MeshConfig* mesh_new(
 	s.w_port_ext = w_port_ext;
 
 	mesh_calc_coord(&s);
-	mesh_auto_predict(&s, h);
+	if (mesh_auto_predict(&s, h) != 0) {
+		mom_error(TEXT("generate_mesh(): ")
+				TEXT("not enough memory"));
+		return NULL;
+	}
 
 	s.n = 0;
 

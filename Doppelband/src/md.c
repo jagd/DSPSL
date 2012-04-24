@@ -37,7 +37,9 @@ struct MD* md_init(int rows, int cols)
 	if ((m == 0) || (m->buf == 0)) {
 		mom_error(TEXT("md_init(): ")
 			TEXT("not enough memory"));
-		free(m);
+		if (m) {
+			free(m);
+		}
 		m = NULL;
 	}
 
@@ -55,6 +57,10 @@ struct MD* md_eye(int rows)
 	}
 #endif
 	m = md_init(rows, rows);
+
+	if (m == NULL) {
+		return NULL;
+	}
 
 	for (i = 0; i < rows; ++i) {
 		m->buf[i*rows + i] = 1;
