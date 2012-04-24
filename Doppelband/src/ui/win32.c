@@ -1,5 +1,6 @@
 #include <windows.h>
 #include <stdio.h>
+#include <math.h>
 
 #include "resource.h"
 
@@ -28,6 +29,138 @@ double w1, w2, d, h, eps_r, port_ext;
 
 HWND hMainDlg;
 
+/* n > 0*/
+static double nocrt_pow(double x,int n)
+{
+	double result;
+
+	if (n == 0) {
+		return 1;
+	} else if (n < 0) {
+		return nocrt_pow(1/x, -n);
+	} else if (n == 1) {
+		return x;
+	}
+
+	result = nocrt_pow(x, (n>>1));
+	result *= result;
+
+	if(n & 1){ /*wenn nichtgerade Zahl*/
+		result*=x;
+	}
+
+	return result;
+}
+
+static void Chop(TCHAR* str)
+{
+	int i, j;
+
+	/* chop the head */
+	i = 0;
+	while (str[i] == ' '
+		|| str[i] == '\t'
+		|| str[i] == '\n'
+		|| str[i] == '\r'
+		) {
+ 		++i;
+	}
+
+	j = 0;
+	while (str[i] != 0) {
+		str[j++] = str[i++];
+	}
+	str[j] = 0;
+
+	/* chop the tail */
+	--j;
+	while (j >= 0
+		&& ( str[j] == ' '
+		  || str[j] == '\t'
+		  || str[j] == '\n'
+		  || str[j] == '\r'
+		  )) {
+		--j;
+	}
+	str[j+1] = 0;
+}
+
+/*
+   (sw)scanf do not support formal language check.
+   So implement myself
+   The string will be in-place chopped
+*/
+static int StringToDouble(TCHAR* str, double *val)
+{
+	int i = 0;
+	int sign = 1, esign = 1;
+	double x = 0;
+	int xe = 0, e = 0;
+	char flag = 1;
+
+	Chop(str);
+
+	if (str[i] == (TCHAR)'-') {
+		sign = -1;
+		++i;
+	}
+
+	while (str[i] >= (TCHAR)'0' && str[i] <= (TCHAR)'9') {
+		x *= 10;
+		x += str[i++] - (TCHAR)'0';
+		flag = 0;
+	}
+
+	if (sign < 0) {
+		x = -x;
+	}
+
+	if (str[i] == (TCHAR)'.') {
+		++i;
+		while (str[i] >= (TCHAR)'0' && str[i] <= (TCHAR)'9') {
+			x *= 10;
+			x += str[i++] - (TCHAR)'0';
+			++xe;
+		}
+		flag = 0;
+	}
+
+	if (flag) {
+		return -1;
+	}
+
+	if (str[i] == 'e' || str[i] == 'E') {
+		flag = 1;
+
+		++i;
+		if (str[i] == (TCHAR)'-') {
+			esign = -1;
+			++i;
+		}
+		while (str[i] >= (TCHAR)'0' && str[i] <= (TCHAR)'9') {
+			e *= 10;
+			e += str[i++] - (TCHAR)'0';
+			flag = 0;
+		}
+
+		if (esign < 0) {
+			e = -e;
+		}
+	}
+
+	if (flag) {
+		return -1;
+	}
+
+	e -= xe;
+
+	if (str[i] != 0) {
+		return -1; /* error */
+	} else {
+		*val = x * nocrt_pow(10, e);
+		return 0;
+	}
+}
 
 static void trace(LPTSTR msg)
 {
@@ -98,47 +231,78 @@ int Read(HWND hDlg)
 
 
 	GetDlgItemText(hDlg, IDC_EDIT_W1, buf, TEXT_BUF_LENGTH);
-	swscanf_s(buf, TEXT("%le"), &w1);
+	if (0 != StringToDouble(buf, &w1)) {
+		mom_error(TEXT("unrecognized value:"));
+		mom_error(buf);
+		return 1;
+	}
+
 	w1 *= 1e-3;
 	if (w1 < 1e-20) {
 		mom_error(TEXT("ERROR: The value of `w1` must be > 0"));
 		return 1;
 	}
 
+
 	GetDlgItemText(hDlg, IDC_EDIT_W2, buf, TEXT_BUF_LENGTH);
-	swscanf_s(buf, TEXT("%le"), &w2);
+	if (0 != StringToDouble(buf, &w2)) {
+		mom_error(TEXT("unrecognized value:"));
+		mom_error(buf);
+		return 1;
+	}
 	if (w2 < 1e-20) {
 		mom_error(TEXT("ERROR: The value of `w2` must be > 0"));
 		return 1;
 	}
 	w2 *= 1e-3;
 
+
 	GetDlgItemText(hDlg, IDC_EDIT_H, buf, TEXT_BUF_LENGTH);
-	swscanf_s(buf, TEXT("%le"), &h);
+	if (0 != StringToDouble(buf, &h)) {
+		mom_error(TEXT("unrecognized value:"));
+		mom_error(buf);
+		return 1;
+	}
 	if (h < 1e-20) {
 		mom_error(TEXT("ERROR: The value of `h` must be > 0"));
 		return 1;
 	}
 	h *= 1e-3;
 
+
 	GetDlgItemText(hDlg, IDC_EDIT_PORT, buf, TEXT_BUF_LENGTH);
-	swscanf_s(buf, TEXT("%le"), &port_ext);
+	if (0 != StringToDouble(buf, &port_ext)) {
+		mom_error(TEXT("unrecognized value:"));
+		mom_error(buf);
+		return 1;
+	}
 	if (port_ext < 1e-20) {
 		mom_error(TEXT("small `p` will be supported in the next version"));
 		return 1;
 	}
 	port_ext *= 1e-3;
 
+
 	GetDlgItemText(hDlg, IDC_EDIT_EPS, buf, TEXT_BUF_LENGTH);
-	swscanf_s(buf, TEXT("%le"), &eps_r);
+	if (0 != StringToDouble(buf, &eps_r)) {
+		mom_error(TEXT("unrecognized value:"));
+		mom_error(buf);
+		return 1;
+	}
 	if (eps_r < 1.0) {
 		mom_error(TEXT("ERROR: epsilon_r must be > 1"));
 		return 1;
 	}
 
+
 	GetDlgItemText(hDlg, IDC_EDIT_D, buf, TEXT_BUF_LENGTH);
-	swscanf_s(buf, TEXT("%le"), &d);
+	if (0 != StringToDouble(buf, &d)) {
+		mom_error(TEXT("unrecognized value:"));
+		mom_error(buf);
+		return 1;
+	}
 	d *= 1e-3;
+
 
 	return 0;
 }
