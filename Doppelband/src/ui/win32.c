@@ -164,13 +164,6 @@ INT_PTR CALLBACK MainWndProc(
 			break;
 		case WM_COMMAND:
 			switch (LOWORD(wParam)) {
-				case IDHELP:
-					MessageBox(
-						hDlg,
-						ABOUT_INFO,
-						TEXT("ABOUT"),
-						MB_OK);
-				break;
 				case IDOK:
 					if (Read(hDlg) == 0) {
 						CreateThread(
@@ -183,6 +176,13 @@ INT_PTR CALLBACK MainWndProc(
 
 					}
 					break;
+				case IDHELP:
+					MessageBox(
+						hDlg,
+						ABOUT_INFO,
+						TEXT("ABOUT"),
+						MB_OK);
+				break;
 			}
 			break;
 		case WM_CLOSE:

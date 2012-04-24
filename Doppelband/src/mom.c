@@ -580,12 +580,24 @@ static INLINE struct MD* mom_matrix_new(
 
 	a = md_init(conf->index[ID_MESH_CELLS],
 		conf->index[ID_MESH_CELLS]);
+
+	if (a == 0) {
+		mom_trace(TEXT("Could not create matrix"));
+		return NULL;
+	}
+
 	/* set 0 for the E equations,
 	 * they are lightly sparse */
 	md_fill(a, 0);
 
 	k = md_init(conf->index[ID_MESH_CELLS],
 		conf->index[ID_MESH_CELLS]);
+
+	if (k == 0) {
+		mom_trace(TEXT("Could not create matrix"));
+		return NULL;
+	}
+
 	md_fill(k, 0);
 
 	potential_equations(conf, a, k);
@@ -647,6 +659,12 @@ static INLINE struct MD* calc_b(
 	struct MD *b;
 
 	b = md_init(inv_a->cols, 1);
+
+	if (b == NULL) {
+		mom_error(TEXT("Failed to create matrix"));
+		return NULL;
+	}
+
 	md_fill(b, 0);
 
 	for (i = conf->index[ID_STRIP0_START];
@@ -670,6 +688,12 @@ static INLINE struct MD* extract_freespace(
 	struct MD *m0;
 
 	m0 = md_init(conf->index[ID_STRIP_END], conf->index[ID_STRIP_END]);
+
+	if (m0 == NULL) {
+		mom_error(TEXT("Failed to create matrix"));
+		return NULL;
+	}
+
 	for (i = 0; i < m0->rows; ++i) {
 		int j;
 		for (j = 0; j < m0->cols; ++j) {
@@ -736,9 +760,19 @@ double mom(
 	mom_trace(TEXT("Filling matrix"));
 
 	a[1] = mom_matrix_new(conf, &k[1]);
+	if (a[1] == NULL || k[1] == NULL) {
+		mom_trace(TEXT("Calculation failed"));
+		return -1;
+	}
 
 	a[0] = extract_freespace(conf, a[1]);
 	k[0] = md_eye(conf->index[ID_STRIP_END]);
+
+	if (a[0] == NULL || k[0] == NULL) {
+		mom_trace(TEXT("Calculation failed"));
+		return -1;
+	}
+
 
 	mom_trace(TEXT("Inverting matrix"));
 

@@ -79,6 +79,10 @@ static INLINE void mesh_auto_predict(struct MeshState *s, double h)
 	s->conf = (struct MeshConfig*)malloc(sizeof(struct MeshConfig));
 	s->conf->mesh = (struct Cell_1D*)malloc(
 			sizeof(struct Cell_1D) * max_cells);
+	if (s->conf == 0 || s->conf->mesh == 0) {
+		mom_error(TEXT("Create configuration failed"));
+		return;
+	}
 
 #ifdef MOM_MESH_ENABLE_DEBUG
 	snprintf(debug_buf, DEBUG_BUF_SIZE
