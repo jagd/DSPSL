@@ -40,6 +40,9 @@
 #define INDEX_SIZE		5
 
 
+/* relative permittivity under this value will be treated as 1.0 */
+#define EPS_MIN 1.35
+
 struct Cell_1D {
 	double centre;
 	double hw; /* half of the width */

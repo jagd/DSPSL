@@ -108,8 +108,8 @@ static void input()
 		printf(TEXT("Relative permittivity = "));
 		scanf(TEXT("%le"), &eps_r);
 
-		if (eps_r < 1.2) {
-			puts(TEXT("Too small permittivity is not allowed!"));
+		if (eps_r < 1) {
+			puts(TEXT("The relative permittivity must > 1.0 !"));
 		} else {
 			break;
 		}

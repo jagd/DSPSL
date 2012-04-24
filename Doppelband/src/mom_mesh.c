@@ -530,10 +530,27 @@ struct MeshConfig* mesh_new(
 	mesh_strip0(&s);
 	mesh_strip1(&s);
 
-	mesh_dielectric0_left(&s);
-	mesh_dielectric0_right(&s);
-	mesh_dielectric1_left(&s);
-	mesh_dielectric1_right(&s);
+	/* too small eps_r cause singularity */
+	if (eps_r > EPS_MIN) {
+		mesh_dielectric0_left(&s);
+		mesh_dielectric0_right(&s);
+		mesh_dielectric1_left(&s);
+		mesh_dielectric1_right(&s);
+	} else {
+		if (eps_r != 1.0) {
+			mom_trace(TEXT("WARNING: ")
+				TEXT("epsilon should be either 1.0 ")
+				TEXT("or much bigger than 1"));
+			mom_trace(TEXT("Calculation with epsilon_r = 1.0"));
+			eps_r = 1.0;
+		}
+
+
+		s.conf->index[ID_DIELECTRIC0_START] = s.n;
+		s.conf->index[ID_DIELECTRIC0_END] = s.n;
+		s.conf->index[ID_DIELECTRIC1_START] = s.n;
+		s.conf->index[ID_DIELECTRIC1_END] = s.n;
+	}
 
 	s.conf->index[ID_MESH_CELLS] = s.n;
 	s.conf->h = h;
@@ -541,46 +558,46 @@ struct MeshConfig* mesh_new(
 
 #ifdef MOM_MESH_ENABLE_DEBUG
 	snprintf(debug_buf, DEBUG_BUF_SIZE
-			, TEXT("Used number of cells = %d\n")
+			, TEXT("Used number of cells = %d")
 			, s.conf->index[ID_MESH_CELLS]);
 	mom_trace(debug_buf);
 
 	snprintf(debug_buf, DEBUG_BUF_SIZE
-			, TEXT("Number of cells for strip[0] = %d\n")
+			, TEXT("Number of cells for strip[0] = %d")
 			, s.conf->index[ID_STRIP0_END]
 				- s.conf->index[ID_STRIP0_START]);
 	mom_trace(debug_buf);
 
 	snprintf(debug_buf, DEBUG_BUF_SIZE
-			, TEXT("Number of cells for strip[1] = %d\n")
+			, TEXT("Number of cells for strip[1] = %d")
 			, s.conf->index[ID_STRIP1_END]
 				- s.conf->index[ID_STRIP1_START]);
 	mom_trace(debug_buf);
 
 	snprintf(debug_buf, DEBUG_BUF_SIZE
-			, TEXT("Number of cells for dielectric[0] = %d\n")
+			, TEXT("Number of cells for dielectric[0] = %d")
 	      		, s.conf->index[ID_DIELECTRIC0_END]
 				- s.conf->index[ID_DIELECTRIC0_START]);
 	mom_trace(debug_buf);
 
 	snprintf(debug_buf, DEBUG_BUF_SIZE
-			, TEXT("Number of cells for dielectric[1] = %d\n")
+			, TEXT("Number of cells for dielectric[1] = %d")
 			, s.conf->index[ID_DIELECTRIC1_END]
 				- s.conf->index[ID_DIELECTRIC1_START]);
 	mom_trace(debug_buf);
 
 	snprintf(debug_buf, DEBUG_BUF_SIZE
-			, TEXT("    Port = [ %le\t%le ]\n")
+			, TEXT("    Port = [ %le\t%le ]")
 			, s.port.left, s.port.right);
 	mom_trace(debug_buf);
 
 	snprintf(debug_buf, DEBUG_BUF_SIZE
-			, TEXT("Strip[0] = [ %le\t%le ]\n")
+			, TEXT("Strip[0] = [ %le\t%le ]")
 			, s.strip[0].left, s.strip[0].right);
 	mom_trace(debug_buf);
 
 	snprintf(debug_buf, DEBUG_BUF_SIZE
-			,TEXT("Strip[1] = [ %le\t%le ]\n")
+			,TEXT("Strip[1] = [ %le\t%le ]")
 			, s.strip[1].left, s.strip[1].right);
 	mom_trace(debug_buf);
 #endif
