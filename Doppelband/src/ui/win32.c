@@ -8,8 +8,7 @@
 #include "../mom_mesh.h"
 #include "../mom.h"
 
-#define VERSION_STR TEXT("0.2")
-
+#define VERSION_STR TEXT("0.3")
 
 #define ABOUT_INFO \
 	TEXT("Calculate the characteristic Impedance ")\
@@ -188,15 +187,15 @@ DWORD WINAPI Calc(LPVOID lpParam)
 		);
 
 	swprintf_s(buf, TEXT_BUF_LENGTH,
-		TEXT("Mesh cells = %d\n"), conf->index[ID_MESH_CELLS]);
+		TEXT("Mesh cells = %d"), conf->index[ID_MESH_CELLS]);
 	trace(buf);
 
 	swprintf_s(buf, TEXT_BUF_LENGTH,
-		TEXT("\tcells for strips = %d\n"), conf->index[ID_STRIP_END]);
+		TEXT("\tcells for strips = %d"), conf->index[ID_STRIP_END]);
 	trace(buf);
 
 	swprintf_s(buf, TEXT_BUF_LENGTH,
-		TEXT("\tcells for dielectrics = %d\n"),
+		TEXT("\tcells for dielectrics = %d"),
 			conf->index[ID_DIELECTRIC_END]
 				-conf->index[ID_DIELECTRIC_START]);
 	trace(buf);
@@ -204,10 +203,10 @@ DWORD WINAPI Calc(LPVOID lpParam)
 	z0 = mom(conf, x0, x, c);
 
 	swprintf_s(buf, TEXT_BUF_LENGTH,
-		TEXT("Effective permittivity = %lf\n"), c[1]/c[0]);
+		TEXT("Effective permittivity = %lf"), c[1]/c[0]);
 	trace(buf);
 
-	swprintf_s(buf, TEXT_BUF_LENGTH, TEXT("Z0 = %lf Ohm\n"), z0);
+	swprintf_s(buf, TEXT_BUF_LENGTH, TEXT("Z0 = %lf Ohm"), z0);
 	trace(buf);
 
 	md_free(x[0]);
@@ -337,7 +336,6 @@ INT_PTR CALLBACK MainWndProc(
 							GetDlgItem(hDlg, IDOK),
 							0,
 							&dwTID);
-
 					}
 					break;
 				case IDHELP:
