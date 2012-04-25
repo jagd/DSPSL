@@ -3,7 +3,7 @@
 // Used by win32.rc
 //
 #define IDD_DLG_MAIN                    101
-#define IDB_LAYOUT                      103
+#define IDB_LAYOUT                      102
 #define IDC_IMAGE                       1000
 #define IDC_EDIT_W1                     1001
 #define IDC_EDIT_W2                     1002
@@ -18,7 +18,7 @@
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        105
+#define _APS_NEXT_RESOURCE_VALUE        103
 #define _APS_NEXT_COMMAND_VALUE         40001
 #define _APS_NEXT_CONTROL_VALUE         1009
 #define _APS_NEXT_SYMED_VALUE           101

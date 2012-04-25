@@ -7,7 +7,8 @@
 //
 // Generated from the TEXTINCLUDE 2 resource.
 //
-#include "afxres.h"
+#include "windows.h"
+#define IDC_STATIC -1
 /////////////////////////////////////////////////////////////////////////////
 #undef APSTUDIO_READONLY_SYMBOLS
 
@@ -33,7 +34,7 @@ FONT 10, "MS Shell Dlg", 400, 0, 0x0
 BEGIN
     PUSHBUTTON      "&Calculate",IDOK,206,124,50,14
     PUSHBUTTON      "&About",IDHELP,206,144,50,14
-    CONTROL         103,IDC_IMAGE,"Static",SS_BITMAP | SS_CENTERIMAGE,0,0,266,117
+    CONTROL         IDB_LAYOUT,IDC_IMAGE,"Static",SS_BITMAP | SS_CENTERIMAGE,0,0,266,117
     GROUPBOX        "Configuration",IDC_STATIC,7,117,93,90
     GROUPBOX        "Advanced Parameter",IDC_STATIC,101,117,97,45
     LTEXT           "w&1 =",IDC_STATIC,15,133,18,8
@@ -56,7 +57,7 @@ BEGIN
     LTEXT           "&mesh step",IDC_STATIC,110,146,35,8
     EDITTEXT        IDC_EDIT_MESHSTEP,148,144,40,14,ES_CENTER | ES_AUTOHSCROLL | ES_NUMBER | WS_DISABLED
     GROUPBOX        "Result",IDC_STATIC,102,162,156,47
-    LISTBOX         IDC_LIST_RESULT,103,171,154,38,LBS_USETABSTOPS | LBS_NOINTEGRALHEIGHT | WS_VSCROLL | WS_HSCROLL | WS_TABSTOP
+    LISTBOX         IDC_LIST_RESULT,103,171,154,38,LBS_USETABSTOPS | LBS_NOINTEGRALHEIGHT | LBS_DISABLENOSCROLL | WS_VSCROLL | WS_HSCROLL | WS_TABSTOP
 END
 
 
@@ -80,12 +81,13 @@ END
 
 3 TEXTINCLUDE 
 BEGIN
-    "\r\0"
+    "\0"
 END
 
 2 TEXTINCLUDE 
 BEGIN
-    "#include ""afxres.h""\r\0"
+    "#include ""windows.h""\r\n"
+    "#define IDC_STATIC -\0"
 END
 
 #endif    // APSTUDIO_INVOKED
@@ -116,7 +118,7 @@ END
 //
 // Generated from the TEXTINCLUDE 3 resource.
 //
-
+
 /////////////////////////////////////////////////////////////////////////////
 #endif    // not APSTUDIO_INVOKED
 
