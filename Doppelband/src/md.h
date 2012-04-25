@@ -9,7 +9,7 @@ struct MD {
 	double *buf;
 };
 
-struct MD* md_init(int rows, int cols);
+struct MD* md_new(int rows, int cols);
 void md_fill(struct MD *m, double val);
 void md_free(struct MD *m);
 

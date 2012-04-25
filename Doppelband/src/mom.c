@@ -578,7 +578,7 @@ static INLINE struct MD* mom_matrix_new(
 {
 	struct MD *a, *k;
 
-	a = md_init(conf->index[ID_MESH_CELLS],
+	a = md_new(conf->index[ID_MESH_CELLS],
 		conf->index[ID_MESH_CELLS]);
 
 	if (a == 0) {
@@ -590,7 +590,7 @@ static INLINE struct MD* mom_matrix_new(
 	 * they are lightly sparse */
 	md_fill(a, 0);
 
-	k = md_init(conf->index[ID_MESH_CELLS],
+	k = md_new(conf->index[ID_MESH_CELLS],
 		conf->index[ID_MESH_CELLS]);
 
 	if (k == 0) {
@@ -659,7 +659,7 @@ static INLINE struct MD* calc_b(
 	int i;
 	struct MD *b;
 
-	b = md_init(inv_a->cols, 1);
+	b = md_new(inv_a->cols, 1);
 
 	if (b == NULL) {
 		mom_error(TEXT("Failed to create matrix"));
@@ -688,7 +688,7 @@ static INLINE struct MD* extract_freespace(
 	int i;
 	struct MD *m0;
 
-	m0 = md_init(conf->index[ID_STRIP_END], conf->index[ID_STRIP_END]);
+	m0 = md_new(conf->index[ID_STRIP_END], conf->index[ID_STRIP_END]);
 
 	if (m0 == NULL) {
 		mom_error(TEXT("Failed to create matrix"));

@@ -20,22 +20,23 @@ void md_dump(struct MD *m)
 }
 #endif
 
-struct MD* md_init(int rows, int cols)
+/* md_new(): cells will not be inited  !!! */
+struct MD* md_new(int rows, int cols)
 {
 	struct MD *m;
 
 	if (rows <= 0 || cols <= 0) {
-		mom_error(TEXT("md_init():")
+		mom_error(TEXT("md_new():")
 			TEXT("number of rows and columns must be positive"));
 	}
 
 	m = (struct MD*)malloc(sizeof(struct MD));
 	m->rows = rows;
 	m->cols = cols;
-	m->buf = (double*)malloc(sizeof(double)*rows*cols);
+	m->buf = (double*)malloc(rows*cols*sizeof(double));
 
 	if ((m == 0) || (m->buf == 0)) {
-		mom_error(TEXT("md_init(): ")
+		mom_error(TEXT("md_new(): ")
 			TEXT("not enough memory"));
 		if (m) {
 			free(m);
@@ -45,6 +46,7 @@ struct MD* md_init(int rows, int cols)
 
 	return m;
 }
+
 
 struct MD* md_eye(int rows)
 {
@@ -56,11 +58,13 @@ struct MD* md_eye(int rows)
 		mom_error(TEXT("md_eye(): matrix size must be > 0"));
 	}
 #endif
-	m = md_init(rows, rows);
+	m = md_new(rows, rows);
 
 	if (m == NULL) {
 		return NULL;
 	}
+
+	md_fill(m, 0);
 
 	for (i = 0; i < rows; ++i) {
 		m->buf[i*rows + i] = 1;
@@ -283,7 +287,7 @@ struct MD* md_mul(struct MD *a, struct MD *b)
 	}
 #endif
 
-	c = md_init(a->rows, b->cols);
+	c = md_new(a->rows, b->cols);
 
 	if (c == NULL) {
 		mom_error(TEXT("md_mul(): ")

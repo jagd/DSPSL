@@ -10,7 +10,7 @@ void inv_big_random()
 	struct MD *a;
 	int i, j;
 
-	a = md_init(size, size);
+	a = md_new(size, size);
 
 	for (i = 0; i < size; ++i) {
 		for (j = 0; j < size; ++j) {
@@ -29,7 +29,7 @@ void inv_small_random()
 	struct MD *a;
 	int i, j;
 
-	a = md_init(size, size);
+	a = md_new(size, size);
 
 	for (i = 0; i < size; ++i) {
 		for (j = 0; j < size; ++j) {
@@ -46,7 +46,7 @@ void inv_tiny()
 {
 	struct MD *a;
 
-	a = md_init(3, 3);
+	a = md_new(3, 3);
 	md_fill(a, 0);
 	md_set(a, 0, 0, 2);
 	md_set(a, 0, 1, 7);
@@ -72,14 +72,14 @@ void mul_tiny()
 {
 	struct MD *a, *b, *c;
 
-	a = md_init(2, 2);
+	a = md_new(2, 2);
 	md_fill(a, 0);
 	md_set(a, 0, 0, 1);
 	md_set(a, 0, 1, 2);
 	md_set(a, 1, 0, 3);
 	md_set(a, 1, 1, 4);
 
-	b = md_init(2, 1);
+	b = md_new(2, 1);
 	md_fill(b, 0);
 	md_set(b, 0, 0, 2);
 	md_set(b, 1, 0, 3);
