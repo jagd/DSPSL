@@ -24,6 +24,6 @@ clean:
 
 win32.exe: win32.rc win32.c $(DEPENDENCY_SRC)
 	wrc win32.rc
-	winegcc $(CFLAGS) -DUNICODE -mwindows -mno-cygwin \
+	winegcc $(CFLAGS) -DUNICODE -mwindows -mno-cygwin -lcomctl32 \
 		win32.res win32.c\
 		$(DEPENDENCY_SRC) -o $@
