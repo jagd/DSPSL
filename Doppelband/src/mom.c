@@ -606,7 +606,7 @@ static INLINE struct MD* mom_matrix_new(
 	return a;
 }
 
-static INLINE void calc_pot(
+static INLINE int calc_pot(
 	struct MeshConfig *conf,
 	struct MD *inv_a,
 	struct MD *k,
@@ -618,6 +618,10 @@ static INLINE void calc_pot(
 	double k1 = 0, k2 = 0;
 
 	aux = md_mul(k, inv_a);
+
+	if (aux == NULL) {
+		return -1;
+	}
 
 	for (i = conf->index[ID_STRIP_START];
 		i < conf->index[ID_STRIP_END]; ++i) {
@@ -647,6 +651,8 @@ static INLINE void calc_pot(
 	*/
 
 	md_free(aux);
+
+	return 0;
 }
 
 
@@ -769,6 +775,8 @@ double mom(
 	k[0] = md_eye(conf->index[ID_STRIP_END]);
 
 	if (a[0] == NULL || k[0] == NULL) {
+		md_free(a[1]);
+		md_free(k[1]);
 		mom_trace(TEXT("Calculation failed"));
 		return -1;
 	}
@@ -781,8 +789,16 @@ double mom(
 
 	mom_trace(TEXT("Extracting the result"));
 
-	calc_pot(conf, a[0], k[0], pot[0]);
-	calc_pot(conf, a[1], k[1], pot[1]);
+	if (	(calc_pot(conf, a[0], k[0], pot[0]) != 0)
+	     ||	(calc_pot(conf, a[1], k[1], pot[1]) != 0) ){
+		md_free(a[0]);
+		md_free(a[1]);
+		md_free(k[0]);
+		md_free(k[1]);
+		mom_trace(TEXT("Calculation failed"));
+		return -1;
+	}
+
 
 	b[0] = calc_b(conf, a[0], pot[0]);
 	b[1] = calc_b(conf, a[1], pot[1]);
