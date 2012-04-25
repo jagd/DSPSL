@@ -3,7 +3,7 @@
 #include <math.h>
 
 #include "global.h"
-#include "mom_mesh.h"
+#include "mesh.h"
 
 #ifdef MOM_MESH_ENABLE_DEBUG
 #define DEBUG_BUF_SIZE 1000

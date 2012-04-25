@@ -2,7 +2,7 @@
 
 CFLAGS:=-O3 -Wall $(CFLAGS)
 
-all: global.o mom.o mom_mesh.o md.o test ui
+all: global.o mom.o mesh.o md.o test ui
 
 global.o: global.c
 	$(CC) -c $(CFLAGS) $^ -o $@
@@ -10,7 +10,7 @@ global.o: global.c
 mom.o: mom.c
 	$(CC) -c $(CFLAGS) $^ -o $@
 
-mom_mesh.o: mom_mesh.c
+mesh.o: mesh.c
 	$(CC) -c $(CFLAGS) $^ -o $@
 
 md.o: md.c
@@ -21,7 +21,7 @@ test: md_test mom_test
 md_test: md_test.c md.c global.c
 	$(CC) -D MD_ENABLE_DEBUG -lm $(CFLAGS) $^ -o $@
 
-mom_test: mom_test.c mom.c mom_mesh.c md.c global.c
+mom_test: mom_test.c mom.c mesh.c md.c global.c
 	$(CC) -D MD_ENABLE_DEBUG -D MOM_MESH_ENABLE_DEBUG -lm $(CFLAGS) $^ -o $@
 
 clean:

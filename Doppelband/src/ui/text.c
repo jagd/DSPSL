@@ -4,7 +4,6 @@
 #include <string.h>
 
 #include "../global.h"
-#include "../mom_mesh.h"
 #include "../mom.h"
 
 #define PATH_GNUPLOT TEXT("/usr/bin/gnuplot")

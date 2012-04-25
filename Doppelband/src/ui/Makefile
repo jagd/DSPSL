@@ -3,8 +3,8 @@
 LINKER=$(CC)
 
 CFLAGS:=-O3 -Wall $(CFLAGS)
-DEPENDENCY:= ../global.o ../mom.o ../mom_mesh.o ../md.o
-DEPENDENCY_SRC:= ../global.c ../mom.c ../mom_mesh.c ../md.c
+DEPENDENCY:= ../global.o ../mom.o ../mesh.o ../md.o
+DEPENDENCY_SRC:= ../global.c ../mom.c ../mesh.c ../md.c
 
 all: text win32.exe
 

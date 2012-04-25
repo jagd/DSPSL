@@ -1,7 +1,7 @@
 #ifndef __MOM_H__
 #define __MOM_H__
 
-#include "mom_mesh.h"
+#include "mesh.h"
 #include "md.h"
 
 double mom(

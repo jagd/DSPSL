@@ -3,8 +3,7 @@
 #include <math.h>
 
 #include "global.h"
-#include "mom_mesh.h"
-#include "md.h"
+#include "mom.h"
 
 #define CONST_INV_2_PI_EPS0	(1.0 / (2.0*M_PI*EPS0))
 

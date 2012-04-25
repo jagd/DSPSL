@@ -5,7 +5,6 @@
 #include "resource.h"
 
 #include "../global.h"
-#include "../mom_mesh.h"
 #include "../mom.h"
 
 #define VERSION_STR TEXT("0.3")

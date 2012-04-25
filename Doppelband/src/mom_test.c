@@ -3,7 +3,6 @@
 #include <math.h>
 
 #include "global.h"
-#include "mom_mesh.h"
 #include "mom.h"
 
 #define PATH_GNUPLOT "/usr/bin/gnuplot"
