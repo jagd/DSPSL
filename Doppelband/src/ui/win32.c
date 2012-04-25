@@ -26,6 +26,7 @@ TCHAR buf[TEXT_BUF_LENGTH + 1];
 double w1, w2, d, h, eps_r, port_ext;
 
 HWND hMainDlg;
+HINSTANCE hInst;
 
 /* n > 0*/
 static double nocrt_pow(double x,int n)
@@ -162,8 +163,13 @@ static int StringToDouble(TCHAR* str, double *val)
 
 static void trace(LPTSTR msg)
 {
+	int n;
 	SendDlgItemMessage(hMainDlg, IDC_LIST_RESULT,
 		LB_ADDSTRING, 0, (LPARAM)msg);
+	n = SendDlgItemMessage(hMainDlg, IDC_LIST_RESULT,
+		LB_GETCOUNT, 0, 0);
+	SendDlgItemMessage(hMainDlg, IDC_LIST_RESULT,
+		LB_SETCURSEL, n-1, 0);
 }
 
 
@@ -323,6 +329,9 @@ INT_PTR CALLBACK MainWndProc(
 			SetDlgItemText(hDlg, IDC_EDIT_EPS, TEXT("2.2"));
 			SetDlgItemText(hDlg, IDC_EDIT_D, TEXT("0.0"));
 			SetDlgItemText(hDlg, IDC_EDIT_MESHSTEP, TEXT("auto"));
+
+			SetClassLong(hDlg, GCL_HICON, 
+			    (LONG)LoadIcon(hInst, MAKEINTRESOURCE(IDI_ICON))); 
 			break;
 		case WM_COMMAND:
 			switch (LOWORD(wParam)) {
@@ -372,6 +381,8 @@ int WINAPI WinMain(HINSTANCE hInstance,
 		   LPSTR lpCmdLine,
 		   int nShowCmd)
 {
+	hInst = hInstance;
+
 	mom_trace = inter_trace;
 	mom_error = mom_trace;
 
