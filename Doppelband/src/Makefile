@@ -19,10 +19,10 @@ md.o: md.c
 test: md_test mom_test
 
 md_test: md_test.c md.c global.c
-	$(CC) -D MD_ENABLE_DEBUG -lm $(CFLAGS) $^ -o $@
+	$(CC) -D MD_ENABLE_DEBUG $(CFLAGS) $^ -lm -o $@
 
 mom_test: mom_test.c mom.c mesh.c md.c global.c
-	$(CC) -D MD_ENABLE_DEBUG -D MOM_MESH_ENABLE_DEBUG -lm $(CFLAGS) $^ -o $@
+	$(CC) -D MD_ENABLE_DEBUG -D MOM_MESH_ENABLE_DEBUG $(CFLAGS) $^ -lm -o $@
 
 clean:
 	-rm tags

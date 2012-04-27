@@ -11,7 +11,7 @@ all: text win32.exe
 	-$(MAKE) win32.exe
 
 text: text.o $(DEPENDENCY)
-	$(LINKER) -lm $^ -o $@
+	$(LINKER) $^ -lm -o $@
 
 text.o: text.c
 	$(CC) -c $(CFLAGS) $^ -o $@
