@@ -1,6 +1,6 @@
 .PHONY: all clean
 
-LINKER=$(CC)
+LINKER:=$(CC)
 
 CFLAGS:=-O3 -Wall $(CFLAGS)
 DEPENDENCY_OBJ:= ../global.o ../mom.o ../mesh.o ../md.o
@@ -29,15 +29,15 @@ clean:
 	-rm plot.txt
 	-rm *.res *.exe *.so
 
-wine: win32
+wine: win32.exe
 
-mingw: win32
+mingw: win32.exe
 
-win32: win32.res win32.o $(DEPENDENCY_OBJ)
-	$(LINKER) -DUNICODE -mwindows -mno-cygwin -lcomctl32 $^ -o $@
+win32.exe: resource.o win32.o $(DEPENDENCY_OBJ)
+	$(LINKER) $(CFLAGS) -lgdi32 -lcomctl32 -o $@ $^
 
 win32.o: win32.c
-	$(CC) -c -D MOM_ENABLE_COMCTL $(CFLAGS) $^ -o $@
+	$(CC) -c $(CFLAGS) $^ -o $@
 
-win32.res: win32.rc
-	$(RC) win32.rc
+resource.o: win32.rc
+	$(RC) -o$@ $^

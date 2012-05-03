@@ -657,7 +657,9 @@ int WINAPI WinMain(HINSTANCE hThis,
 		   int nShowCmd)
 {
 #ifdef MOM_ENABLE_COMCTL
+#ifndef OLD_STYLE_COMCTL
 	INITCOMMONCONTROLSEX cc;
+#endif
 #endif
 	hInst = hThis;
 
@@ -669,9 +671,13 @@ int WINAPI WinMain(HINSTANCE hThis,
 		IMAGE_BITMAP, 0,0, LR_SHARED | LR_DEFAULTSIZE);
 
 #ifdef MOM_ENABLE_COMCTL
+#ifndef OLD_STYLE_COMCTL
 	cc.dwSize = sizeof(cc);
 	cc.dwICC = ICC_STANDARD_CLASSES;
 	InitCommonControlsEx(&cc);
+#else
+	InitCommonControls();
+#endif
 #endif
 
 	if (hLayoutBMP == NULL) {

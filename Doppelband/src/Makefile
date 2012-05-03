@@ -2,10 +2,23 @@
 
 
 ifeq "$(BUILD_WITH)" "wine"
+export CFLAGS:=$(CFLAGS) \
+		-mwindows -mno-cygwin\
+		-DUNICODE -D_UNICODE\
+		-DMOM_ENABLE_COMCTL
 export CC:=winegcc
 export RC:=wrc
 endif
 
+ifeq "$(BUILD_WITH)" "mingw"
+export CFLAGS:=$(CFLAGS)\
+		-Dswprintf_s=snwprintf\
+		-mwindows\
+		-DUNICODE -D_UNICODE
+		# -DMOM_ENABLE_COMCTL
+export CC:=i686-w64-mingw32-gcc
+export RC:=i686-w64-mingw32-windres
+endif
 
 CFLAGS:=-O3 -Wall $(CFLAGS)
 
