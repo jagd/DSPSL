@@ -18,10 +18,10 @@ endif
 all: text $(OTHER_PLATFORM)
 
 text: text.o $(DEPENDENCY_OBJ)
-	$(LINKER) $^ -lm -o $@
+	$(LINKER) $^ -lm -o$@
 
 text.o: text.c
-	$(CC) -c $(CFLAGS) $^ -o $@
+	$(CC) -c $(CFLAGS) $^ -o$@
 
 clean:
 	-rm *.o
@@ -34,10 +34,10 @@ wine: win32.exe
 mingw: win32.exe
 
 win32.exe: resource.o win32.o $(DEPENDENCY_OBJ)
-	$(LINKER) $(CFLAGS) -lgdi32 -lcomctl32 -o $@ $^
+	$(LINKER) $(CFLAGS) -o$@ $^ -lgdi32 -lcomctl32
 
 win32.o: win32.c
-	$(CC) -c $(CFLAGS) $^ -o $@
+	$(CC) -c $(CFLAGS) $^ -o$@
 
 resource.o: win32.rc
 	$(RC) -o$@ $^
