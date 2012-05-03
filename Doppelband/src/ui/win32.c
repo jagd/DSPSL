@@ -3,7 +3,7 @@
 #include <windows.h>
 
 /* without commctrl is also usable , only for visual styles */
-#define MOM_ENABLE_COMCTL
+/* #define MOM_ENABLE_COMCTL */
 
 #ifdef MOM_ENABLE_COMCTL
 #include <commctrl.h>

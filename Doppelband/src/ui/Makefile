@@ -3,14 +3,21 @@
 LINKER=$(CC)
 
 CFLAGS:=-O3 -Wall $(CFLAGS)
-DEPENDENCY:= ../global.o ../mom.o ../mesh.o ../md.o
+DEPENDENCY_OBJ:= ../global.o ../mom.o ../mesh.o ../md.o
 DEPENDENCY_SRC:= ../global.c ../mom.c ../mesh.c ../md.c
 
-all: text win32.exe
-	$(MAKE) text
-	-$(MAKE) win32.exe
 
-text: text.o $(DEPENDENCY)
+ifeq "$(BUILD_WITH)" "wine"
+OTHER_PLATFORM:=$(OTHER_PLATFORM) wine
+endif
+
+ifeq "$(BUILD_WITH)" "mingw"
+OTHER_PLATFORM:=$(OTHER_PLATFORM) mingw
+endif
+
+all: text $(OTHER_PLATFORM)
+
+text: text.o $(DEPENDENCY_OBJ)
 	$(LINKER) $^ -lm -o $@
 
 text.o: text.c
@@ -18,12 +25,19 @@ text.o: text.c
 
 clean:
 	-rm *.o
-	-rm text
+	-rm text win32
 	-rm plot.txt
-	-rm *.res *.exe *.exe.so
+	-rm *.res *.exe *.so
 
-win32.exe: win32.rc win32.c $(DEPENDENCY_SRC)
-	wrc win32.rc
-	winegcc $(CFLAGS) -DUNICODE -mwindows -mno-cygwin -lcomctl32 \
-		win32.res win32.c\
-		$(DEPENDENCY_SRC) -o $@
+wine: win32
+
+mingw: win32
+
+win32: win32.res win32.o $(DEPENDENCY_OBJ)
+	$(LINKER) -DUNICODE -mwindows -mno-cygwin -lcomctl32 $^ -o $@
+
+win32.o: win32.c
+	$(CC) -c -D MOM_ENABLE_COMCTL $(CFLAGS) $^ -o $@
+
+win32.res: win32.rc
+	$(RC) win32.rc
