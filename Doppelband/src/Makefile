@@ -26,7 +26,7 @@ endif
 
 all: global.o mom.o mesh.o md.o ui
 
-test: md_test$(POSTFIX) mom_test$(POSTFIX) 
+test: md_test$(POSTFIX) mom_test$(POSTFIX)
 
 global.o: global.c
 	$(CC) -c $(CFLAGS) $^ -o$@
