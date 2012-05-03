@@ -1,10 +1,9 @@
 .PHONY: tags all ui clean test
 
-CFLAGS:=$(CFLAGS) -O3 -Wall -msse3 -mfpmath=sse2
+CFLAGS:=$(CFLAGS) -O3 -Wall -msse3 -mfpmath=sse
 
 ifeq "$(BUILD_WITH)" "wine"
 export CFLAGS:=$(CFLAGS)\
-		-mwindows -mno-cygwin\
 		-DUNICODE -D_UNICODE\
 		-DMOM_ENABLE_COMCTL
 export CC:=winegcc
@@ -14,11 +13,11 @@ endif
 ifeq "$(BUILD_WITH)" "mingw"
 export CFLAGS:=$(CFLAGS)\
 		-Dswprintf_s=snwprintf\
-		-mwindows\
 		-DUNICODE -D_UNICODE\
 		-DMOM_ENABLE_COMCTL
 export CC:=i686-w64-mingw32-gcc
 export RC:=i686-w64-mingw32-windres
+export STRIP:=i686-w64-mingw32-strip
 endif
 
 all: global.o mom.o mesh.o md.o ui

@@ -1,4 +1,4 @@
-.PHONY: all clean
+.PHONY: all clean strip
 
 LINKER:=$(CC)
 
@@ -15,7 +15,7 @@ ifeq "$(BUILD_WITH)" "mingw"
 OTHER_PLATFORM:=$(OTHER_PLATFORM) mingw
 endif
 
-all: text $(OTHER_PLATFORM)
+all: $(OTHER_PLATFORM) text
 
 text: text.o $(DEPENDENCY_OBJ)
 	$(LINKER) $^ -lm -o$@
@@ -31,13 +31,16 @@ clean:
 
 wine: win32.exe
 
-mingw: win32.exe
+mingw: win32.exe strip
 
 win32.exe: resource.o win32.o $(DEPENDENCY_OBJ)
-	$(LINKER) $(CFLAGS) -o$@ $^ -lgdi32 -lcomctl32
+	$(LINKER) -mwindows $(CFLAGS) -o$@ $^ -lgdi32 -lcomctl32
 
 win32.o: win32.c
 	$(CC) -c $(CFLAGS) $^ -o$@
+
+strip: win32.exe
+	$(STRIP) -s $^
 
 resource.o: win32.rc
 	$(RC) -o$@ $^
