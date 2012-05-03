@@ -15,7 +15,9 @@ typedef TCHAR* LPTSTR;
 #define INLINE inline
 #endif
 
-#ifdef _WIN32
+#ifdef _MSC_VER
+
+/* msvcrt does not have fmin() and fmax() */
 
 INLINE static double fmax(double a, double b)
 {
