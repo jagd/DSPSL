@@ -4,10 +4,13 @@ CFLAGS:=$(CFLAGS) -O3 -Wall -msse3 -mfpmath=sse
 
 ifeq "$(BUILD_WITH)" "wine"
 export CFLAGS:=$(CFLAGS)\
+		-DCRT_NO_FMAX\
+		-mno-cygwin\
 		-DUNICODE -D_UNICODE\
 		-DMOM_ENABLE_COMCTL
 export CC:=winegcc
 export RC:=wrc
+export POSTFIX:=.exe
 endif
 
 ifeq "$(BUILD_WITH)" "mingw"
@@ -18,11 +21,12 @@ export CFLAGS:=$(CFLAGS)\
 export CC:=i686-w64-mingw32-gcc
 export RC:=i686-w64-mingw32-windres
 export STRIP:=i686-w64-mingw32-strip
+export POSTFIX:=.exe
 endif
 
 all: global.o mom.o mesh.o md.o ui
 
-test: md_test mom_test
+test: md_test$(POSTFIX) mom_test$(POSTFIX) 
 
 global.o: global.c
 	$(CC) -c $(CFLAGS) $^ -o$@
@@ -36,10 +40,10 @@ mesh.o: mesh.c
 md.o: md.c
 	$(CC) -c $(CFLAGS) $^ -o$@
 
-md_test: md_test.c md.c global.c
+md_test$(POSTFIX): md_test.c md.c global.c
 	$(CC) -D MD_ENABLE_DEBUG $(CFLAGS) $^ -lm -o$@
 
-mom_test: mom_test.c mom.c mesh.c md.c global.c
+mom_test$(POSTFIX): mom_test.c mom.c mesh.c md.c global.c
 	$(CC) -D MD_ENABLE_DEBUG -D MOM_MESH_ENABLE_DEBUG $(CFLAGS) $^ -lm -o$@
 
 clean:

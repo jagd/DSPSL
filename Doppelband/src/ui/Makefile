@@ -15,10 +15,10 @@ ifeq "$(BUILD_WITH)" "mingw"
 OTHER_PLATFORM:=$(OTHER_PLATFORM) mingw
 endif
 
-all: $(OTHER_PLATFORM) text
+all: $(OTHER_PLATFORM) text$(POSTFIX)
 
-text: text.o $(DEPENDENCY_OBJ)
-	$(LINKER) $^ -lm -o$@
+text$(POSTFIX): text.o $(DEPENDENCY_OBJ)
+	$(LINKER) $(CFLAGS) $^ -lm -o$@
 
 text.o: text.c
 	$(CC) -c $(CFLAGS) $^ -o$@
@@ -29,18 +29,18 @@ clean:
 	-rm plot.txt
 	-rm *.res *.exe *.so
 
-wine: win32.exe
+wine: win32$(POSTFIX)
+mingw: win32$(POSTFIX) strip
 
-mingw: win32.exe strip
-
-win32.exe: resource.o win32.o $(DEPENDENCY_OBJ)
+win32$(POSTFIX): resource.o win32.o $(DEPENDENCY_OBJ)
 	$(LINKER) -mwindows $(CFLAGS) -o$@ $^ -lgdi32 -lcomctl32
 
 win32.o: win32.c
 	$(CC) -c $(CFLAGS) $^ -o$@
 
-strip: win32.exe
-	$(STRIP) -s $^
+strip: win32$(POSTFIX) text$(POSTFIX)
+	-$(STRIP) -s win32$(POSTFIX)
+	-$(STRIP) -s text$(POSTFIX)
 
 resource.o: win32.rc
 	$(RC) -o$@ $^

@@ -6,16 +6,31 @@
 #include "../global.h"
 #include "../mom.h"
 
-#define PATH_GNUPLOT "/usr/bin/gnuplot"
+#ifdef _WIN32
+#ifdef UNICODE /* for win32 */
+#define printf wprintf
+#define scanf wscanf
+#define fprintf fwprintf
+#define strcpy lstrcpy
+#define strlen lstrlen
+#define puts _putws
+#define gets _getws
+#define fgets fgetws
+#define fopen _wfopen
+#endif /* UNICODE */
+#endif /* _WIN32 */
+
+
+#define PATH_GNUPLOT TEXT("/usr/bin/gnuplot")
 
 #define PATH_LENGTH 2000
 
 double w1, w2, d, h, eps_r, port_ext;
-char path[PATH_LENGTH];
+TCHAR path[PATH_LENGTH];
 
-#define DEFAULT_PLOT_PATH "plot.txt"
+#define DEFAULT_PLOT_PATH TEXT("plot.txt")
 
-static void chomp(char str[])
+static void chomp(TCHAR str[])
 {
 	int i;
 
@@ -26,10 +41,10 @@ static void chomp(char str[])
 	--i;
 
 	while (i >= 0 &&
-		(str[i] == '\n'
-		 || str[i] == '\r'
-		 || str[i] == ' '
-		 || str[i] == '\t'))
+		(str[i] == (TCHAR)'\n'
+		 || str[i] == (TCHAR)'\r'
+		 || str[i] == (TCHAR)' '
+		 || str[i] == (TCHAR)'\t'))
 	{
 		str[i--] = 0;
 	}
@@ -38,77 +53,78 @@ static void chomp(char str[])
 static void input()
 {
 	puts(
-		"\n\n"
-		"                              w1   |< extra width >|\n"
-		"    ------------------------=======-----------------\n"
-		"    ////////////////////////////////////////////////\n"
-		"    ////////////////////////////////////////////////\n"
-		"    /////////////////    epsilon   /////////////////\n"
-		"    ////////////////////////////////////////////////\n"
-		"    /////////////////   w2  ////////////////////////\n"
-		"    -----------------=========----------------------\n"
-		"    |< extra width >|    |      |\n"
-		"                         |< d  >|\n"
-		"\n\n"
+		TEXT("\n\n")
+		TEXT("                              w1   |< extra width >|\n")
+		TEXT("    ------------------------=======-----------------\n")
+		TEXT("    ////////////////////////////////////////////////\n")
+		TEXT("    ////////////////////////////////////////////////\n")
+		TEXT("    /////////////////    epsilon   /////////////////\n")
+		TEXT("    ////////////////////////////////////////////////\n")
+		TEXT("    /////////////////   w2  ////////////////////////\n")
+		TEXT("    -----------------=========----------------------\n")
+		TEXT("    |< extra width >|    |      |\n")
+		TEXT("                         |< d  >|\n")
+		TEXT("\n\n")
 	      );
 
 	while (1) {
-		printf("Width `w1` of the top strip (in mm) = ");
-		scanf("%le", &w1);
+		printf(TEXT("Width `w1` of the top strip (in mm) = "));
+		scanf(TEXT("%le"), &w1);
 		w1 *= 1e-3;
 		if (w1 < 1e-20) {
-			puts("`w1` must be bigger than zero!");
+			puts(TEXT("`w1` must be bigger than zero!"));
 		} else {
 			break;
 		}
 	}
 
+
 	while (1) {
-		printf("Width `w2` of the bottom strip (in mm) = ");
-		scanf("%le", &w2);
+		printf(TEXT("Width `w2` of the bottom strip (in mm) = "));
+		scanf(TEXT("%le"), &w2);
 		w2 *= 1e-3;
 
 		if (w2 < 1e-20) {
-			puts("`w2` must be bigger than zero!");
+			puts(TEXT("`w2` must be bigger than zero!"));
 		} else {
 			break;
 		}
 	}
 
 	while (1) {
-		printf("Extra width of the port (in mm) = ");
-		scanf("%le", &port_ext);
+		printf(TEXT("Extra width of the port (in mm) = "));
+		scanf(TEXT("%le"), &port_ext);
 		port_ext *= 1e-3;
 
 		if (port_ext < 1e-20) {
-			puts("The extra width must be bigger than zero!");
+			puts(TEXT("The extra width must be bigger than zero!"));
 		} else {
 			break;
 		}
 	}
 
 	while (1) {
-		printf("Height of the substrat (in mm) = ");
-		scanf("%le", &h);
+		printf(TEXT("Height of the substrat (in mm) = "));
+		scanf(TEXT("%le"), &h);
 		h *= 1e-3;
 
 		if (h < 1e-20) {
-			puts("The Height must be bigger than zero!");
+			puts(TEXT("The Height must be bigger than zero!"));
 		} else {
 			break;
 		}
 	}
 
-	printf("The offset `d` between the centre of both strips (in mm) = ");
-	scanf("%le", &d);
+	printf(TEXT("The offset `d` between the centre of both strips (in mm) = "));
+	scanf(TEXT("%le"), &d);
 	d *= 1e-3;
 
 	while (1) {
-		printf("Relative permittivity = ");
-		scanf("%le", &eps_r);
+		printf(TEXT("Relative permittivity = "));
+		scanf(TEXT("%le"), &eps_r);
 
 		if (eps_r < 1) {
-			puts("The relative permittivity must > 1.0 !");
+			puts(TEXT("The relative permittivity must > 1.0 !"));
 		} else {
 			break;
 		}
@@ -116,8 +132,8 @@ static void input()
 
 	fgets(path, PATH_LENGTH - 1, stdin); /* pass one \n */
 
-	printf("The file name to plot the charge density with dielectric "
-		"[%s] : ", DEFAULT_PLOT_PATH);
+	printf(TEXT("The file name to plot the charge density with dielectric ")
+		TEXT("[%s] : "), DEFAULT_PLOT_PATH);
 	fgets(path, PATH_LENGTH - 1, stdin);
 	chomp(path);
 	if (strlen(path) == 0) {
@@ -143,88 +159,88 @@ void calc()
 		eps_r
 		);
 
-	printf("Mesh cells = %d\n", conf->index[ID_MESH_CELLS]);
-	printf("\tcells for strips = %d\n", conf->index[ID_STRIP_END]);
-	printf("\tcells for dielectrics = %d\n",
+	printf(TEXT("Mesh cells = %d\n"), conf->index[ID_MESH_CELLS]);
+	printf(TEXT("\tcells for strips = %d\n"), conf->index[ID_STRIP_END]);
+	printf(TEXT("\tcells for dielectrics = %d\n"),
 			conf->index[ID_DIELECTRIC_END]
 				-conf->index[ID_DIELECTRIC_START]);
 
 	z0 = mom(conf, x0, x, c);
 
 
-	printf("Effective permittivity = %lf\n", c[1]/c[0]);
-	printf("Z0 = %lf Ohm\n", z0);
+	printf(TEXT("Effective permittivity = %lf\n"), c[1]/c[0]);
+	printf(TEXT("Z0 = %lf Ohm\n"), z0);
 
-	fplot = fopen(path, "w");
+	fplot = fopen(path, TEXT("w"));
 
 	if (fplot) {
-		fprintf(fplot, "#!" PATH_GNUPLOT "\n");
+		fprintf(fplot, TEXT("#!" PATH_GNUPLOT "\n"));
 
-		fprintf(fplot, "set title \"all charges with dielectric\"\n");
-		fprintf(fplot, "plot '-' notitle with impulse, \\\n"
-				"\t'-' notitle with impulse\n");
-		fprintf(fplot, "# top all charges\n");
+		fprintf(fplot, TEXT("set title \"all charges with dielectric\"\n"));
+		fprintf(fplot, TEXT("plot '-' notitle with impulse, \\\n")
+				TEXT("\t'-' notitle with impulse\n"));
+		fprintf(fplot, TEXT("# top all charges\n"));
 		for (i = conf->index[ID_STRIP0_START];
 			i < conf->index[ID_STRIP0_END]; ++i) {
-			fprintf(fplot, "%le %le\n", conf->mesh[i].centre, x[1]->buf[i]);
+			fprintf(fplot, TEXT("%le %le\n"), conf->mesh[i].centre, x[1]->buf[i]);
 		}
 		for (i = conf->index[ID_DIELECTRIC0_START];
 			i < conf->index[ID_DIELECTRIC0_END]; ++i) {
-			fprintf(fplot, "%le %le\n", conf->mesh[i].centre, x[1]->buf[i]);
+			fprintf(fplot, TEXT("%le %le\n"), conf->mesh[i].centre, x[1]->buf[i]);
 		}
-		fprintf(fplot, "e\n");
-		fprintf(fplot, "# bottom all charges\n");
+		fprintf(fplot, TEXT("e\n"));
+		fprintf(fplot, TEXT("# bottom all charges\n"));
 		for (i = conf->index[ID_STRIP1_START];
 			i < conf->index[ID_STRIP1_END]; ++i) {
-			fprintf(fplot, "%le %le\n", conf->mesh[i].centre, x[1]->buf[i]);
+			fprintf(fplot, TEXT("%le %le\n"), conf->mesh[i].centre, x[1]->buf[i]);
 		}
 		for (i = conf->index[ID_DIELECTRIC1_START];
 			i < conf->index[ID_DIELECTRIC1_END]; ++i) {
-			fprintf(fplot, "%le %le\n", conf->mesh[i].centre, x[1]->buf[i]);
+			fprintf(fplot, TEXT("%le %le\n"), conf->mesh[i].centre, x[1]->buf[i]);
 		}
-		fprintf(fplot, "e\npause -1\n");
+		fprintf(fplot, TEXT("e\npause -1\n"));
 
 
-		fprintf(fplot, "set title \"free charges with dielectric\"\n");
-		fprintf(fplot, "plot '-' notitle with impulse, \\\n"
-				"\t'-' notitle with impulse\n");
-		fprintf(fplot, "# top free charges\n");
+		fprintf(fplot, TEXT("set title \"free charges with dielectric\"\n"));
+		fprintf(fplot, TEXT("plot '-' notitle with impulse, \\\n")
+				TEXT("\t'-' notitle with impulse\n"));
+		fprintf(fplot, TEXT("# top free charges\n"));
 		for (i = conf->index[ID_STRIP0_START];
 			i < conf->index[ID_STRIP0_END]; ++i) {
-			fprintf(fplot, "%le %le\n", conf->mesh[i].centre, x[0]->buf[i]);
+			fprintf(fplot, TEXT("%le %le\n"), conf->mesh[i].centre, x[0]->buf[i]);
 		}
 		for (i = conf->index[ID_DIELECTRIC0_START];
 			i < conf->index[ID_DIELECTRIC0_END]; ++i) {
-			fprintf(fplot, "%le %le\n", conf->mesh[i].centre, x[0]->buf[i]);
+			fprintf(fplot, TEXT("%le %le\n"), conf->mesh[i].centre, x[0]->buf[i]);
 		}
-		fprintf(fplot, "e\n");
-		fprintf(fplot, "# bottom free charges\n");
+		fprintf(fplot, TEXT("e\n"));
+		fprintf(fplot, TEXT("# bottom free charges\n"));
 		for (i = conf->index[ID_STRIP1_START];
 			i < conf->index[ID_STRIP1_END]; ++i) {
-			fprintf(fplot, "%le %le\n", conf->mesh[i].centre, x[0]->buf[i]);
+			fprintf(fplot, TEXT("%le %le\n"), conf->mesh[i].centre, x[0]->buf[i]);
 		}
 		for (i = conf->index[ID_DIELECTRIC1_START];
 			i < conf->index[ID_DIELECTRIC1_END]; ++i) {
-			fprintf(fplot, "%le %le\n", conf->mesh[i].centre, x[0]->buf[i]);
+			fprintf(fplot, TEXT("%le %le\n"), conf->mesh[i].centre, x[0]->buf[i]);
 		}
-		fprintf(fplot, "e\npause -1\n");
+		fprintf(fplot, TEXT("e\npause -1\n"));
 
 
-		fprintf(fplot, "set title \"charges in free space\"\n");
-		fprintf(fplot, "plot '-' notitle with impulse, \\\n"
-				"\t'-' notitle with impulse\n");
-		fprintf(fplot, "# top free charges\n");
+		fprintf(fplot, TEXT("set title \"charges in free space\"\n"));
+		fprintf(fplot, TEXT("plot '-' notitle with impulse, \\\n")
+				TEXT("\t'-' notitle with impulse\n"));
+		fprintf(fplot, TEXT("# top free charges\n"));
 		for (i = conf->index[ID_STRIP0_START];
 			i < conf->index[ID_STRIP0_END]; ++i) {
-			fprintf(fplot, "%le %le\n", conf->mesh[i].centre, x[1]->buf[i]);
+			fprintf(fplot, TEXT("%le %le\n"), conf->mesh[i].centre, x[1]->buf[i]);
 		}
-		fprintf(fplot, "e\n");
-		fprintf(fplot, "# bottom free charges\n");
+		fprintf(fplot, TEXT("e\n"));
+		fprintf(fplot, TEXT("# bottom free charges\n"));
 		for (i = conf->index[ID_STRIP1_START];
 			i < conf->index[ID_STRIP1_END]; ++i) {
-			fprintf(fplot, "%le %le\n", conf->mesh[i].centre, x[1]->buf[i]);
+			fprintf(fplot, TEXT("%le %le\n"), conf->mesh[i].centre, x[1]->buf[i]);
 		}
-		fprintf(fplot, "e\npause -1\n");
+		fprintf(fplot, TEXT("e\npause -1\n"));
 
 		fclose(fplot);
 	}
@@ -238,10 +254,10 @@ void calc()
 }
 
 /*
-   wrap the puts function,
+   wrap the puts/printf function,
    because its `const char*` parameter is not C89 compatible
 */
-void trace(char *s)
+void trace(TCHAR *s)
 {
 	puts(s);
 }

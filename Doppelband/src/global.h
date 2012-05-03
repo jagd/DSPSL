@@ -15,8 +15,7 @@ typedef TCHAR* LPTSTR;
 #define INLINE inline
 #endif
 
-#ifdef _MSC_VER
-
+#ifdef CRT_NO_FMAX
 /* msvcrt does not have fmin() and fmax() */
 
 INLINE static double fmax(double a, double b)
@@ -28,8 +27,8 @@ INLINE static double fmin(double a, double b)
 {
 	return a<=b?a:b;
 }
-
 #endif
+
 
 extern void (*mom_trace)(TCHAR *);
 extern void (*mom_error)(TCHAR *);
