@@ -1,7 +1,7 @@
 set BuildDir=Build
 set ExeName=win32.exe
 
-set CFLAGS=/Ox /Ob2 /Oi /Ot /Oy /GL /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /D "_UNICODE" /D "UNICODE" /FD /MT /GS- /Gy /arch:SSE2 /Zc:wchar_t- /GR- /Fo"%BuildDir%\\" /W3 /nologo /c /Zi /Gr /TC /Fd"%BuildDir%\\"
+set CFLAGS=/Ox /Ob2 /Oi /Ot /Oy /GL /D "CRT_NO_FMAX" /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /D "_UNICODE" /D "UNICODE" /FD /MT /GS- /Gy /arch:SSE2 /Zc:wchar_t- /GR- /Fo"%BuildDir%\\" /W3 /nologo /c /Zi /Gr /TC /Fd"%BuildDir%\\"
 
 set LDFLAGS=/OUT:"%BuildDir%\%ExeName%" /NOLOGO /MANIFESTUAC:NO /IGNOREIDL /SUBSYSTEM:WINDOWS /OPT:REF /OPT:ICF /LTCG /RELEASE /DYNAMICBASE /NXCOMPAT:NO /MACHINE:X86 kernel32.lib user32.lib gdi32.lib comctl32.lib
 
