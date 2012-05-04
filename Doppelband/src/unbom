@@ -1,2 +1,7 @@
 #!/bin/sh
+
+# Wine's wrc can not process the resources files with unicode bom,
+# which is always default by visual studio.
+# So we have to remove the bom flag
+
 sed -i -e 's/^\xef\xbb\xbf//' $*
