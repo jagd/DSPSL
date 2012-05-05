@@ -156,7 +156,8 @@ void calc()
 		d,
 		port_ext,
 		h,
-		eps_r
+		eps_r,
+		-1 /* use suggest value */
 		);
 
 	printf(TEXT("Mesh cells = %d\n"), conf->index[ID_MESH_CELLS]);
