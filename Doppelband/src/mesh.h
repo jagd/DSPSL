@@ -62,7 +62,9 @@ struct MeshConfig* mesh_new(
 		double offset, /* offset of the centre of both strip */
 		double w_port_ext, /* extend width in both side */
 		double h, /* only for determination of the mesh length */
-		double eps_r /* epsilon_r */
+		double eps_r, /* epsilon_r */
+		double mesh_step /* if this value not positive,
+				    a mesh step will be suggested */
 		);
 
 void mesh_free(struct MeshConfig *m);

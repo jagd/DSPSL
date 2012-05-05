@@ -14,11 +14,11 @@
 #include "../global.h"
 #include "../mom.h"
 
-#define VERSION_STR TEXT("0.3")
+#define VERSION_STR TEXT("0.4")
 
 #define TEXT_BUF_LENGTH 1000
 TCHAR buf[TEXT_BUF_LENGTH + 1];
-double w1, w2, d, h, eps_r, port_ext;
+double w1, w2, d, h, eps_r, port_ext, mesh_step;
 
 struct PlotData {
 	struct MeshConfig *conf;
@@ -26,6 +26,7 @@ struct PlotData {
 };
 
 TCHAR StrInf[] = TEXT("INF");
+TCHAR StrAuto[] = TEXT("AUTO");
 
 HWND hMainDlg;
 HINSTANCE hInst;
@@ -353,18 +354,36 @@ DWORD WINAPI Calc(LPVOID lpParam)
 	EnableWindow(GetDlgItem(hMainDlg, IDC_CALC), FALSE);
 
 	/* calc */
-	if (w2 < 0) {
+
+	/* infinite w2 (fall back to microstrip) */
+	if (w2 <= 0) {
 		flag_inf = 1;
 		w2 = w1;
 		d = 0;
 		h *= 2;
+
+		trace(TEXT("Infinite w2 (fall back to microstrip)"));
+		trace(TEXT("Calculation with two symmetric strips"));
 	}
+
+	/* auto port_ext */
+	if (port_ext <= 0) {
+		port_ext = 3.0*h;
+
+		swprintf_s(buf, TEXT_BUF_LENGTH,
+			TEXT("use p = %lf mm ")
+			TEXT("(emulation of a infinite large p)"),
+			1e3*port_ext);
+		trace(buf);
+	}
+
 	conf = mesh_new(
 		w1, w2,
 		d,
 		port_ext,
 		h,
-		eps_r
+		eps_r,
+		mesh_step
 		);
 
 	swprintf_s(buf, TEXT_BUF_LENGTH,
@@ -462,17 +481,22 @@ int Read(HWND hDlg)
 	h *= 1e-3;
 
 
-	GetDlgItemText(hDlg, IDC_EDIT_PORT, buf, TEXT_BUF_LENGTH);
-	if (0 != StringToDouble(buf, &port_ext)) {
+	GetDlgItemText(hDlg, IDC_COMBO_PORT, buf, TEXT_BUF_LENGTH);
+	if (lstrcmpi(buf, StrAuto) == 0) {
+		port_ext = -1;
+	} else if (0 != StringToDouble(buf, &port_ext)) {
 		mom_error(TEXT("unrecognized value:"));
 		mom_error(buf);
 		return 1;
+	} else {
+		port_ext *= 1e-3;
+		/* assume w1 is already processed */
+		if (port_ext < (w1 * 1e-3)) {
+			mom_error(TEXT("small `p` will be supported in the next version"));
+			printf("%le\n", port_ext);
+			return 1;
+		}
 	}
-	if (port_ext < 1e-20) {
-		mom_error(TEXT("small `p` will be supported in the next version"));
-		return 1;
-	}
-	port_ext *= 1e-3;
 
 
 	GetDlgItemText(hDlg, IDC_EDIT_EPS, buf, TEXT_BUF_LENGTH);
@@ -495,6 +519,16 @@ int Read(HWND hDlg)
 	}
 	d *= 1e-3;
 
+	GetDlgItemText(hDlg, IDC_COMBO_MESHSTEP, buf, TEXT_BUF_LENGTH);
+	if (lstrcmpi(buf, StrAuto) == 0) {
+		mesh_step = -1;
+	} else if (0 != StringToDouble(buf, &mesh_step)) {
+		mom_error(TEXT("unrecognized value:"));
+		mom_error(buf);
+		return 1;
+	} else {
+		mesh_step *= 1e-3;
+	}
 
 	return 0;
 }
@@ -587,14 +621,18 @@ INT_PTR CALLBACK MainWndProc(
 
 			SendDlgItemMessage(hDlg, IDC_COMBO_W2,
 				CB_ADDSTRING, 0, (LPARAM)StrInf);
+			SendDlgItemMessage(hDlg, IDC_COMBO_PORT,
+				CB_ADDSTRING, 0, (LPARAM)StrAuto);
+			SendDlgItemMessage(hDlg, IDC_COMBO_MESHSTEP,
+				CB_ADDSTRING, 0, (LPARAM)StrAuto);
 
 			SetDlgItemText(hDlg, IDC_EDIT_W1, TEXT("2.4"));
 			SetDlgItemText(hDlg, IDC_COMBO_W2, TEXT("10"));
 			SetDlgItemText(hDlg, IDC_EDIT_H, TEXT("0.79"));
-			SetDlgItemText(hDlg, IDC_EDIT_PORT, TEXT("2.0"));
+			SetDlgItemText(hDlg, IDC_COMBO_PORT, TEXT("2.0"));
 			SetDlgItemText(hDlg, IDC_EDIT_EPS, TEXT("2.2"));
 			SetDlgItemText(hDlg, IDC_EDIT_D, TEXT("0.0"));
-			SetDlgItemText(hDlg, IDC_EDIT_MESHSTEP, TEXT("auto"));
+			SetDlgItemText(hDlg, IDC_COMBO_MESHSTEP, StrAuto);
 
 			SetClassLong(hDlg, GCL_HICON,
 			    (LONG)LoadIcon(hInst, MAKEINTRESOURCE(IDI_ICON)));

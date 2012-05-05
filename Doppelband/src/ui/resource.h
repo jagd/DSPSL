@@ -13,8 +13,8 @@
 #define IDC_EDIT_H                      1003
 #define IDC_EDIT_D                      1004
 #define IDC_EDIT_EPS                    1005
-#define IDC_EDIT_PORT                   1006
-#define IDC_EDIT_MESHSTEP               1007
+#define IDC_COMBO_PORT                  1006
+#define IDC_COMBO_MESHSTEP              1007
 #define IDC_CHECK_PLOT                  1008
 #define IDC_LIST_RESULT                 1009
 #define IDC_CALC                        1010

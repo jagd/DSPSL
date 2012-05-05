@@ -64,11 +64,18 @@ static INLINE void mesh_calc_coord(struct MeshState *s)
 
 
 /* return: success 0 else non-zero */
-static INLINE int mesh_auto_predict(struct MeshState *s, double h)
+static INLINE int mesh_auto_predict(
+		struct MeshState *s,
+		double h,
+		double mesh_step)
 {
 	int max_cells;
 	/* define the general mesh length */
-	s->mesh_step = fmin(h*0.15, (s->w[0] + s->w[1])*0.025);
+	if (mesh_step <= 0) {
+		s->mesh_step = fmin(h*0.15, (s->w[0] + s->w[1])*0.025);
+	} else {
+		s->mesh_step = mesh_step;
+	}
 
 	/* consider the edge refine */
 	/*
@@ -514,14 +521,16 @@ struct MeshConfig* mesh_new(
 		double offset, /* offset of the centre of both strip */
 		double w_port_ext, /* extend width in both side */
 		double h, /* only for determination of the mesh length */
-		double eps_r /* epsilon_r */
+		double eps_r,  /* epsilon_r */
+		double mesh_step /* if this value not positive,
+				    a mesh step will be suggested */
 		)
 {
 	struct MeshState s;
 
 	/* check inputed parameters */
 	if (w0 <= 0 || w1 <= 0 || w_port_ext <= 0 || h <= 0) {
-		mom_error(TEXT("generate_mesh(): ")
+		mom_error(TEXT("mesh_new(): ")
 				TEXT("Illegal geometric length"));
 		return NULL;
 	}
@@ -532,8 +541,8 @@ struct MeshConfig* mesh_new(
 	s.w_port_ext = w_port_ext;
 
 	mesh_calc_coord(&s);
-	if (mesh_auto_predict(&s, h) != 0) {
-		mom_error(TEXT("generate_mesh(): ")
+	if (mesh_auto_predict(&s, h, mesh_step) != 0) {
+		mom_error(TEXT("mesh_new(): ")
 				TEXT("not enough memory"));
 		return NULL;
 	}

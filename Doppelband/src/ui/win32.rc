@@ -52,10 +52,10 @@ BEGIN
     LTEXT           "&epsilon_r =",IDC_STATIC,9,205,38,8
     EDITTEXT        IDC_EDIT_EPS,51,204,40,12,ES_RIGHT | ES_AUTOHSCROLL
     LTEXT           "&p =",IDC_STATIC,142,129,12,8
-    EDITTEXT        IDC_EDIT_PORT,162,128,40,12,ES_RIGHT | ES_AUTOHSCROLL
+    COMBOBOX        IDC_COMBO_PORT,162,128,40,12,CBS_DROPDOWN | CBS_DISABLENOSCROLL | CBS_UPPERCASE | WS_TABSTOP,WS_EX_RIGHT
     LTEXT           "mm",IDC_STATIC,208,130,14,8
     LTEXT           "&mesh step =",IDC_STATIC,112,147,42,8
-    EDITTEXT        IDC_EDIT_MESHSTEP,162,144,40,12,ES_CENTER | ES_AUTOHSCROLL | ES_NUMBER | WS_DISABLED
+    COMBOBOX        IDC_COMBO_MESHSTEP,162,144,40,12,CBS_DROPDOWN | CBS_DISABLENOSCROLL | CBS_UPPERCASE | WS_TABSTOP,WS_EX_RIGHT
     LTEXT           "mm",IDC_STATIC,208,147,14,8
     CONTROL         "pl&ot free charge density",IDC_CHECK_PLOT,"Button",BS_AUTOCHECKBOX | BS_RIGHT | WS_TABSTOP,129,160,93,10
     GROUPBOX        "Result",IDC_STATIC,99,173,205,50
@@ -72,7 +72,7 @@ BEGIN
     ICON            IDI_ICON,IDC_STATIC,17,32,21,20
     LTEXT           "Version:",IDC_STATIC,7,84,27,8
     LTEXT           "Programmer:",IDC_STATIC,7,97,42,8
-    LTEXT           "0.3",IDC_STATIC,60,84,12,8
+    LTEXT           "0.4",IDC_STATIC,60,84,12,8
     LTEXT           "chuanren.wu@student.kit.edu",IDC_STATIC,60,97,99,8
     LTEXT           "Calculate the characteristic impedance\nof a double strip transmission line using\nthe Method of Moments.\n\nAll of the calculation libraries (including\nthe matrix operation) are wrote by myself.\nThe codes are of course for this problem\nheavily optimized.",IDC_STATIC,60,7,142,67
 END
