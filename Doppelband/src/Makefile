@@ -1,6 +1,6 @@
 .PHONY: tags all ui clean test
 
-CFLAGS:=$(CFLAGS) -O3 -Wall
+CFLAGS:=$(CFLAGS) -O3 -Wall -DNDEBUG
 
 ifeq "$(BUILD_WITH)" "wine"
 export CFLAGS:=$(CFLAGS)\
