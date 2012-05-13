@@ -32,7 +32,7 @@ clean:
 wine: win32$(POSTFIX)
 mingw: win32$(POSTFIX) strip
 
-win32$(POSTFIX): resource.o win32.o $(DEPENDENCY_OBJ)
+win32$(POSTFIX): resource.o win32_manifest.o win32.o $(DEPENDENCY_OBJ)
 	$(LINKER) -mwindows $(CFLAGS) -o$@ $^ -lgdi32 -lcomctl32
 
 win32.o: win32.c
@@ -43,4 +43,7 @@ strip: win32$(POSTFIX) text$(POSTFIX)
 	-$(STRIP) -s text$(POSTFIX)
 
 resource.o: win32.rc
+	$(RC) -o$@ $^
+
+win32_manifest.o: win32_manifest.rc
 	$(RC) -o$@ $^
