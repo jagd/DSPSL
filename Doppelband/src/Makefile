@@ -1,6 +1,10 @@
 .PHONY: tags all ui clean test
 
-CFLAGS:=$(CFLAGS) -O3 -Wall -DNDEBUG
+ifneq "DEBUG" ""
+export CFLAGS:=$(CFLAGS) -O3 -Wall -DNDEBUG -ftree-vectorizer-verbose=2
+else
+export CFLAGS:=$(CFLAGS) -O0 -g -Wall -ftree-vectorizer-verbose=2
+endif
 
 ifeq "$(BUILD_WITH)" "wine"
 export CFLAGS:=$(CFLAGS)\
