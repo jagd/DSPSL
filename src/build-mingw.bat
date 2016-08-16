@@ -1,5 +1,5 @@
 set BuildDir=Build
-set ExeName=win32.exe
+set ExeName=dspsl.exe
 
 set CFLAGS=-O3 -o%BuildDir%\\%ExeName% -DUNICODE -DMOM_ENABLE_COMCTL -D_WIN32_IE=0x0500 -D_WIN32_WINNT=0x0501 -Dswprintf_s=snwprintf
 

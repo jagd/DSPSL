@@ -634,10 +634,10 @@ INT_PTR CALLBACK MainWndProc(
 			SetDlgItemText(hDlg, IDC_EDIT_D, TEXT("0.0"));
 			SetDlgItemText(hDlg, IDC_COMBO_MESHSTEP, StrAuto);
 
-			SetClassLong(hDlg, GCL_HICON,
-			    (LONG)LoadIcon(hInst, MAKEINTRESOURCE(IDI_ICON)));
-			SetWindowLong(GetDlgItem(hDlg, IDC_IMAGE),
-				GWL_WNDPROC, (LONG)StaticImageWndProc);
+			SetClassLongPtr(hDlg, GCLP_HICON,
+			    (LONG_PTR)LoadIcon(hInst, MAKEINTRESOURCE(IDI_ICON)));
+			SetWindowLongPtr(GetDlgItem(hDlg, IDC_IMAGE),
+				GWLP_WNDPROC, (LONG_PTR)StaticImageWndProc);
 
 			GetClientRect(GetDlgItem(hDlg, IDC_LIST_RESULT), &rect);
 			SendDlgItemMessage(hDlg, IDC_LIST_RESULT,
@@ -734,5 +734,5 @@ int WINAPI WinMain(HINSTANCE hThis,
 			HWND_DESKTOP,
 			MainWndProc,
 			0
-		);
+		) ? 1 : 0;
 }
