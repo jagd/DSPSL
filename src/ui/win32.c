@@ -170,7 +170,7 @@ static int StringToDouble(TCHAR* str, double *val)
 
 static void trace(LPTSTR msg)
 {
-	int n;
+	LRESULT n;
 	SendDlgItemMessage(hMainDlg, IDC_LIST_RESULT,
 		LB_ADDSTRING, 0, (LPARAM)msg);
 	n = SendDlgItemMessage(hMainDlg, IDC_LIST_RESULT,
