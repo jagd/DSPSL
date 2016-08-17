@@ -14,7 +14,7 @@
 #include "../global.h"
 #include "../mom.h"
 
-#define VERSION_STR TEXT("0.4")
+#define VERSION_STR TEXT("1.0")
 
 #define TEXT_BUF_LENGTH 1000
 TCHAR buf[TEXT_BUF_LENGTH + 1];
@@ -680,12 +680,6 @@ INT_PTR CALLBACK MainWndProc(
 
 static void inter_trace(TCHAR *msg)
 {
-	/* for non-unicode */
-	/*
-	OemToCharBuff(msg, buf, TEXT_BUF_LENGTH);
-	trace(buf);
-	 */
-
 	trace(msg);
 }
 
