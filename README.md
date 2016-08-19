@@ -16,10 +16,10 @@ from parallel computing, therefore OpenMP or threading is not included.
 - 2012-04-21: First working version.
 
 ## Building
-Since if does not have any dependency, except Win32Apis if you need the GUI, The build system is simple Makefiles and build scripts.
+Since it does not have any dependency than Win32APIs for the GUI, The build system consists of simple Makefiles and batch files.
 
 ### For Windows
-It can be built under gcc or Visual C++:
+The program can be built under gcc or Visual C++:
 - Run the `build-msvc.bat` under Visual Studio command line. Now support both
   x86 and x86-64 builds.
 - Run `build-mingw.bat` for a MingW build.
@@ -29,8 +29,11 @@ It can be built under gcc or Visual C++:
 -  Linux native GUI also be built using libwine.
 
 ## Tests
-This small program does not include the unit tests. However, integration tests will be added in the later versions.
+This small program does not include unit tests. However, integration tests will be added in the later versions.
 
 ## License
 It can be redistributed in either LGPL(v3+) or commercial license, further
 information please contact the author.
+
+## Contact
+**E-Mail**: me(ät)crwu.de
