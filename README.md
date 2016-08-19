@@ -2,7 +2,7 @@
 ![Screenshot Unavailable](https://crwu.de/cn/blog/dspsl/screenshot_gui.png)
 ## Introduction
 A program to calculate the wave / characteristic impedance of the first
-(quasi-TEM) mode for the Double-Side Parallel Strip Line Calculator DSPSL.
+(quasi-TEM) mode for the Double-Side Parallel Strip Line (DSPSL) Calculator.
 Boundary Element Method (BEM) / Method of Moment (MoM) with Finite Volume
 Element is used.
 
