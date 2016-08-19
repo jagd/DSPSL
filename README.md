@@ -19,9 +19,8 @@ from parallel computing, therefore OpenMP or threading is not included.
 Since it does not have any dependency than Win32APIs for the GUI, The build system consists of simple Makefiles and batch files.
 
 ### For Windows
-The program can be built under gcc or Visual C++:
-- Run the `build-msvc.bat` under Visual Studio command line. Now support both
-  x86 and x86-64 builds.
+The program can be built under GCC or Visual C++:
+- Run the `build-msvc.bat` under Visual Studio command line.
 - Run `build-mingw.bat` for a MingW build.
 
 ### For Linux / Unix
