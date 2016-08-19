@@ -67,13 +67,13 @@ FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
     DEFPUSHBUTTON   "&Close",IDOK,152,117,50,14
     ICON            IDI_ICON,IDC_STATIC,17,32,20,20
-    LTEXT           "Version:",IDC_STATIC,7,84,27,8
-    LTEXT           "Contact:",IDC_STATIC,7,97,42,8
-    LTEXT           "1.0",IDC_STATIC,60,84,12,8
-    LTEXT           "Chuanren Wu <me@crwu.de>",IDC_STATIC,60,97,99,8
+    LTEXT           "Version:",IDC_STATIC,7,78,27,8
+    LTEXT           "Contact:",IDC_STATIC,7,91,42,8
+    LTEXT           "1.0",IDC_STATIC,60,78,12,8
+    LTEXT           "Chuanren Wu <me@crwu.de>",IDC_STATIC,60,91,99,8
     LTEXT           "Calculator for the characteristic impedance of a double strip transmission line with Boundary Element Method / Moment Method.\n\nLGPL (v3+) licensed.\nOther license is also possible, please contact the author.",IDC_STATIC,60,7,142,67
-    LTEXT           "Homepage:",IDC_STATIC,7,111,42,8
-    LTEXT           "http://crwu.de",IDC_STATIC,60,111,50,8
+    LTEXT           "Homepage:",IDC_STATIC,7,104,42,8
+    LTEXT           "http://crwu.de/en/blog/dspsl",IDC_STATIC,60,104,93,8
 END
 
 IDD_PLOT DIALOGEX 0, 0, 316, 185
