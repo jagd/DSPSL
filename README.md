@@ -36,6 +36,3 @@ This small program does not include unit tests. However, integration tests will 
 ## License
 It can be redistributed in either LGPL(v3+) or commercial license, further
 information please contact the author.
-
-## Contact
-**E-Mail**: me(ät)crwu.de
