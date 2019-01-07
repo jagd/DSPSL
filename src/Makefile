@@ -22,9 +22,9 @@ export CFLAGS:=$(CFLAGS)\
 		-Dswprintf_s=snwprintf\
 		-DUNICODE -D_UNICODE\
 		-DMOM_ENABLE_COMCTL
-export CC:=i686-w64-mingw32-gcc
-export RC:=i686-w64-mingw32-windres
-export STRIP:=i686-w64-mingw32-strip
+export CC:=x86_64-w64-mingw32-gcc
+export RC:=x86_64-w64-mingw32-windres
+export STRIP:=x86_64-w64-mingw32-strip
 export POSTFIX:=.exe
 endif
 

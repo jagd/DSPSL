@@ -35,7 +35,7 @@ mingw: win32$(POSTFIX) strip
 # win32$(POSTFIX): resource.o win32_manifest.o win32.o $(DEPENDENCY_OBJ)
 
 win32$(POSTFIX): resource.o win32.o $(DEPENDENCY_OBJ)
-	$(LINKER) -mwindows $(CFLAGS) -o$@ $^ -lgdi32 -lcomctl32
+	$(LINKER) -mwindows $(CFLAGS) -o $@ $^ -lgdi32 -lcomctl32
 
 win32.o: win32.c
 	$(CC) -c $(CFLAGS) $^ -o$@
