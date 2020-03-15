@@ -712,6 +712,10 @@ int WINAPI WinMain(HINSTANCE hThis,
 #endif
 #endif
 
+#ifdef DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE_V2
+	SetProcessDpiAwarenessContext(DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE_V2);
+#endif
+
 	if (hLayoutBMP == NULL) {
 		MessageBox(NULL,
 			TEXT("Could not load resource"),
