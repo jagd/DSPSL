@@ -1,5 +1,5 @@
 # DSPSL: Double-Side Parallel Strip Line Calculator
-![Screenshot Unavailable](https://crwu.de/cn/blog/dspsl/screenshot_gui.png)
+![Screenshot Unavailable](screenshot.png)
 ## Introduction
 A program to calculate the wave / characteristic impedance of the first
 (quasi-TEM) mode for the Double-Side Parallel Strip Line (DSPSL) Calculator.
