@@ -14,7 +14,7 @@
 #include "../global.h"
 #include "../mom.h"
 
-#define VERSION_STR TEXT("1.0")
+#define VERSION_STR TEXT("1.1")
 
 #define TEXT_BUF_LENGTH 1000
 TCHAR buf[TEXT_BUF_LENGTH + 1];
